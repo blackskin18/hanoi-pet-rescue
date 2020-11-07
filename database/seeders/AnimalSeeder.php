@@ -17,5 +17,8 @@ class AnimalSeeder extends Seeder
         DB::table('animals')
             ->whereNotNull('age')
             ->update(['date_of_birth' => DB::raw('DATE_SUB(CURDATE(), INTERVAL `age` YEAR)')]);
+
+        DB::table('animals')
+            ->update(['type' => DB::raw("(CASE WHEN `type`='Chó' THEN 1 WHEN `type`='Mèo' THEN 2 ELSE 3 END)")]);
     }
 }

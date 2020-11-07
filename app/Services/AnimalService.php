@@ -2,20 +2,20 @@
 
 namespace App\Services;
 
+use App\Models\AnimalImage;
 use App\Models\Animal;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
+
 
 class AnimalService {
-    public function __construct()
-    {
-    }
-
-
     public function createAnimal($data)
     {
+        $images = $data['images'];
         $code = $this->generateCode();
 
-        Animal::create([
+        // insert animal
+        $animal = Animal::create([
             'code' => $code,
             'name' => $data['name'],
             'description' => $data['description'],
@@ -28,11 +28,23 @@ class AnimalService {
             'note' => $data['note'],
             'created_by' => 6
         ]);
+
+        // insert images
+        foreach($images as $image) {
+            $path = Storage::disk('public')->put('animal_image/'.$animal->id, $image);
+            $filename = explode('/', $path)[count(explode('/', $path )) - 1];
+
+            $animal->animalImage()->create([
+                //'animal_id' => $animal->id,
+                'file_name' => $filename,
+                'created_by' => 6
+            ]);
+        }
     }
 
     private function generateCode()
     {
-        return Animal::max('code');
+        return Animal::max('code') + 1;
     }
 
     private function detectBirth($year, $month)
@@ -40,7 +52,7 @@ class AnimalService {
         $date = Carbon::now();
         $date->sub($year, 'year');
         $date->sub($month, 'month');
-        return $date ->isoFormat('Y-M-D');
+        return $date->isoFormat('Y-M-D');
     }
 
 }

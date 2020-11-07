@@ -32,11 +32,15 @@ class AnimalController extends Controller
         $this->animalService = $animalService;
     }
 
+    public function index()
+    {
+        var_dump(1111);die;
+    }
+
     public function store()
     {
         $this->animalService->createAnimal(request()->all());
-
-        var_dump("123");die;
+        return $this->responseSuccess();
     }
 
 

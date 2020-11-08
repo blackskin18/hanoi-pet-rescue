@@ -1,9 +1,6 @@
 <?php
 
-
-
 namespace App\Http\Controllers\Api;
-
 
 use Illuminate\Http\Request;
 use App\Animal;
@@ -34,12 +31,18 @@ class AnimalController extends Controller
 
     public function index()
     {
-        var_dump(1111);die;
+        $type = request()->get('type');
+        $page = request()->get('page');
+        $limit = request()->get('limit');
+        $animals = $this->animalService->getListAnimalsByType($type, $page, $limit);
+
+        return $this->responseSuccess($animals);
     }
 
     public function store()
     {
         $this->animalService->createAnimal(request()->all());
+
         return $this->responseSuccess();
     }
 

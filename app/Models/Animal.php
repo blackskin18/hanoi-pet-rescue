@@ -7,6 +7,9 @@ use App\AnimalImage;
 
 class Animal extends Model
 {
+    //public static $limitDefault = 20;
+    const LIMIT_DEFAULT = 20;
+
     public $table = "animals";
 
     protected $fillable = [
@@ -33,6 +36,6 @@ class Animal extends Model
 
     public function status()
     {
-        return $this->hasOne('App\Models\Status');
+        return $this->hasOne('App\Models\Status', 'id', 'status');
     }
 }

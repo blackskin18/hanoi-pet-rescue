@@ -4,7 +4,7 @@ namespace App\Http\Response;
 
 trait BaseApiResponse
 {
-    public function responseSuccess($message = '', $data = '')
+    public function responseSuccess($data = '', $message = '')
     {
         $response = [
             'code' => 1,

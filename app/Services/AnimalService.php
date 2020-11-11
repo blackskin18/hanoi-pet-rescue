@@ -47,7 +47,6 @@ class AnimalService
 
         //search
 
-
         if (isset($type) && $type !== '') {
             $animals = Animal::where('type', $type)->offset($page * Animal::LIMIT_DEFAULT);
         } else {
@@ -68,6 +67,15 @@ class AnimalService
         });
 
         return $animals;
+    }
+
+    public function getTotalAnimal($data) {
+        if (isset($type) && $type !== '') {
+            return Animal::where('type', $data['type'])->count();
+        }
+        else {
+            return Animal::count();
+        }
     }
 
     private function generateCode()

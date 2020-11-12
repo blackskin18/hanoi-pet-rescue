@@ -34,7 +34,8 @@ class AnimalController extends Controller
         $type = request()->get('type');
         $page = request()->get('page');
         $limit = request()->get('limit');
-        $animals = $this->animalService->getListAnimalsByType($type, $page, $limit);
+
+        $animals = $this->animalService->getListAnimalsByType(request()->all());
         $total = $this->animalService->getTotalAnimal(request()->all());
 
         return $this->responseSuccess(['cases' => $animals, 'total' => $total]);

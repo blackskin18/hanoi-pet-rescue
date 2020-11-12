@@ -31,7 +31,7 @@ class AnimalService
 
         // insert images
         foreach ($images as $image) {
-            $path = Storage::disk('public')->put('animal_image/'.$animal->id, $image);
+            $path = Storage::disk('public')->put('animal_image/' . $animal->id, $image);
             $filename = explode('/', $path)[count(explode('/', $path)) - 1];
 
             $animal->animalImage()->create([
@@ -41,24 +41,25 @@ class AnimalService
         }
     }
 
-    public function getListAnimalsByType($type, $page, $limit)
+    public function getListAnimalsByType($data)
     {
-        $limit = isset($limit) && $limit != '' ? $limit : Animal::LIMIT_DEFAULT;
+        $limit = isset($data['limit']) && $data['limit'] != '' ? $data['limit'] : Animal::LIMIT_DEFAULT;
+        $page = $data['page'] >= 1 ? $data['page'] : 1;
 
-        //search
-
-        if (isset($type) && $type !== '') {
-            $animals = Animal::where('type', $type)->offset($page * Animal::LIMIT_DEFAULT);
+        if (isset($data['type']) && $data['type'] !== '') {
+            $animals = Animal::where('type', $data['type'])->offset(($page - 1) * Animal::LIMIT_DEFAULT);
         } else {
-            $animals = Animal::offset($page * Animal::LIMIT_DEFAULT);
+            $animals = Animal::offset(($page - 1) * Animal::LIMIT_DEFAULT);
         }
 
-        $animals = $animals->limit($limit)->with('animalImage')->with('status')->get();
+        //search
+        $animals = $this->filterAnimal($animals, $data);
+        $animals = $animals->limit($limit)->with('animalImage')->with('status')->orderBy('code', 'ASC')->get();
 
         // get full image url
         $animals = $animals->map(function ($animal) {
             $animal->animalImage = $animal->animalImage->map(function ($image) {
-                $image->path = url('storage/animal_image/'.$image->animal_id.'/'.$image->file_name);
+                $image->path = url('storage/animal_image/' . $image->animal_id . '/' . $image->file_name);
 
                 return $image;
             });
@@ -69,13 +70,38 @@ class AnimalService
         return $animals;
     }
 
-    public function getTotalAnimal($data) {
+    public function getTotalAnimal($data)
+    {
         if (isset($type) && $type !== '') {
-            return Animal::where('type', $data['type'])->count();
+            $animals = Animal::where('type', $data['type']);
+        } else {
+            $animals = Animal::where('id', '!=', 'null');
         }
-        else {
-            return Animal::count();
+        $animals = $this->filterAnimal($animals, $data);
+
+        return $animals->count();
+    }
+
+    private function filterAnimal($animals, $data) {
+        if (isset($data['code']) && $data['code'] !== '') {
+            $animals->where('code', 'like', '%' . $data['code'] . '%');
         }
+        if (isset($data['description']) && $data['description'] !== '') {
+            $animals->where('description', 'like', '%' . $data['description'] . '%');
+        }
+        if (isset($data['note']) && $data['note'] !== '') {
+            $animals->where('note', 'like', '%' . $data['note'] . '%');
+        }
+        if (isset($data['status_id']) && $data['status_id'] !== '') {
+            $animals->whereIn('status_ids', $data['status_ids']);
+        }
+        if (isset($data['receive_date_start']) && $data['receive_date_start'] !== '') {
+            $animals->where('receive_date', '>=', $data['receive_date_start']);
+        }
+        if (isset($data['receive_date_end']) && $data['receive_date_end'] !== '') {
+            $animals->where('receive_date', '<=', $data['receive_date_end']);
+        }
+        return $animals;
     }
 
     private function generateCode()

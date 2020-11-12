@@ -72,7 +72,7 @@ class AnimalService
 
     public function getTotalAnimal($data)
     {
-        if (isset($type) && $type !== '') {
+        if (isset($data['type']) && $data['type'] !== '') {
             $animals = Animal::where('type', $data['type']);
         } else {
             $animals = Animal::where('id', '!=', 'null');

@@ -31,10 +31,6 @@ class AnimalController extends Controller
 
     public function index()
     {
-        $type = request()->get('type');
-        $page = request()->get('page');
-        $limit = request()->get('limit');
-
         $animals = $this->animalService->getListAnimalsByType(request()->all());
         $total = $this->animalService->getTotalAnimal(request()->all());
 

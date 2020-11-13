@@ -92,8 +92,11 @@ class AnimalService
         if (isset($data['note']) && $data['note'] !== '') {
             $animals->where('note', 'like', '%' . $data['note'] . '%');
         }
-        if (isset($data['status_id']) && $data['status_id'] !== '') {
-            $animals->whereIn('status_ids', $data['status_ids']);
+        if (isset($data['name']) && $data['name'] !== '') {
+            $animals->where('name', 'like', '%' . $data['name'] . '%');
+        }
+        if (isset($data['status']) && $data['status'] !== '') {
+            $animals->whereIn('status', $data['status']);
         }
         if (isset($data['receive_date_start']) && $data['receive_date_start'] !== '') {
             $animals->where('receive_date', '>=', $data['receive_date_start']);

@@ -4,22 +4,30 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Services\PlaceService;
+use App\Models\Place;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 
 class PlaceController extends Controller
 {
     private $placeService;
+    private $userService;
 
-    public function __construct(PlaceService $placeService)
+    public function __construct(PlaceService $placeService, UserService $userService)
     {
         $this->placeService = $placeService;
+        $this->userService = $userService;
     }
 
     public function index()
     {
-        $places = $this->placeService->getPlaces(request()->all());
-//        $total = $this->placeService->getTotalPlaces(request()->all());
-        $total = 1;
+        if(request()->get('type') == Place::FOSTER) {
+            $places = $this->userService->getFoster(request()->all());
+            $total = $this->userService->getTotalFoster(request()->all());
+        } else {
+            $places = $this->placeService->getPlaces(request()->all());
+            $total = $this->placeService->getTotalPlaces(request()->all());
+        }
 
         return $this->responseSuccess(['places' => $places, 'total' => $total]);
     }

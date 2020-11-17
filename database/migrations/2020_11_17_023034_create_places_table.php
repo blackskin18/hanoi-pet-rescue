@@ -28,7 +28,7 @@ class CreatePlacesTable extends Migration
             $table->string('note')->nullable()->default('');
             $table->string('director_name')->nullable()->default('');
             $table->string('director_phone')->nullable()->default('');
-            $table->tinyInteger('type', 4);
+            $table->tinyInteger('type');
             $table->integer('parent_id')->nullable()->default(null);
             $table->timestamps();
         });
@@ -43,6 +43,14 @@ class CreatePlacesTable extends Migration
                 'name' => $hospital->name,
             ]);
         }
+
+        DB::table('places')->insert([
+            'type' => 2,
+            'phone' => '',
+            'address' => '',
+            'note' => '',
+            'name' => 'nhà chung',
+        ]);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class AddColumnToHospitalsTable extends Migration
@@ -20,6 +21,7 @@ class AddColumnToHospitalsTable extends Migration
             $table->string('director_phone')->nullable()->default(null);
         });
 
+        DB::table('hospitals')->update(['type' => 1]);
     }
 
     /**

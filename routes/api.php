@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AnimalController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\PlaceController;
+use App\Http\Controllers\Api\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +23,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('/places/root-hospitals', [PlaceController::class, 'getRootHospitals']);
+Route::post('/auth/login', [AuthController::class, 'login'])->name('login');
+Route::post('/auth/verify-token', [AuthController::class, 'verify']);
 
 Route::apiResource('/cases', AnimalController::class);
 Route::apiResource('/statuses', StatusController::class);

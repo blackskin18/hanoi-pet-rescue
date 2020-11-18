@@ -3,19 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
-use App\Animal;
-use App\AnimalImage;
-use App\AnimalCondition;
-use App\Status;
-use App\AnimalFoster;
-use App\UserRole;
-use App\History;
-use App\user;
-use App\Hospital;
-use App\AnimalHospital;
-use Illuminate\Database\Eloquent\Model;
-use App\Http\Requests\UploadRequest;
-use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\Controller;
 use App\Services\AnimalService;
 use Illuminate\Support\Facades\DB;
@@ -26,6 +13,7 @@ class AnimalController extends Controller
 
     public function __construct(AnimalService $animalService)
     {
+        $this->middleware('jwt-authen');
         $this->animalService = $animalService;
     }
 

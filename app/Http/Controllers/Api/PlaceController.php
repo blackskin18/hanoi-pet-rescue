@@ -15,6 +15,7 @@ class PlaceController extends Controller
 
     public function __construct(PlaceService $placeService, UserService $userService)
     {
+        $this->middleware('jwt-authen');
         $this->placeService = $placeService;
         $this->userService = $userService;
     }

@@ -21,6 +21,19 @@ class UserService
         return $foster;
     }
 
+    public function verifyUser($email, $googleId) {
+        $user = User::where('email', $email)->first();
+        if($user && $user->google_id === $googleId) {
+            return $user;
+        } elseif ($user && $user->google_id == null) {
+            $user->google_id = $googleId;
+            $user->save();
+            return $user;
+        } else {
+            return false;
+        }
+    }
+
     private function filterFoster($foster, $data)
     {
         if (isset($data['name']) && $data['name'] !== '') {

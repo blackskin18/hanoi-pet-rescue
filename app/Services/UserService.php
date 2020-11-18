@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Place;
 use App\Models\User;
 
 class UserService
@@ -21,13 +22,15 @@ class UserService
         return $foster;
     }
 
-    public function verifyUser($email, $googleId) {
+    public function verifyUser($email, $googleId)
+    {
         $user = User::where('email', $email)->first();
-        if($user && $user->google_id === $googleId) {
+        if ($user && $user->google_id === $googleId) {
             return $user;
         } elseif ($user && $user->google_id == null) {
             $user->google_id = $googleId;
             $user->save();
+
             return $user;
         } else {
             return false;
@@ -37,17 +40,18 @@ class UserService
     private function filterFoster($foster, $data)
     {
         if (isset($data['name']) && $data['name'] !== '') {
-            $foster->where('name', 'like', '%' . $data['name'] . '%');
+            $foster->where('name', 'like', '%'.$data['name'].'%');
         }
         if (isset($data['director_name']) && $data['director_name'] !== '') {
-            $foster->where('director_name', 'like', '%' . $data['director_name'] . '%');
+            $foster->where('director_name', 'like', '%'.$data['director_name'].'%');
         }
         if (isset($data['phone']) && $data['phone'] !== '') {
-            $foster->where('phone', 'like', '%' . $data['phone'] . '%');
+            $foster->where('phone', 'like', '%'.$data['phone'].'%');
         }
         if (isset($data['address']) && $data['address'] !== '') {
-            $foster->where('address', 'like', '%' . $data['address'] . '%');
+            $foster->where('address', 'like', '%'.$data['address'].'%');
         }
+
         return $foster;
     }
 
@@ -57,5 +61,19 @@ class UserService
         $foster = $this->filterFoster($foster, $data);
 
         return $foster->count();
+    }
+
+    public function createUser($data)
+    {
+        $user = User::create([
+            'name' => $data['name'],
+            'phone' => $data['phone'] ?? '',
+            'address' => $data['address'] ?? '',
+            'email' => $data['email'],
+            "note" => $data['note'] ?? ''
+        ]);
+
+        $user->roles()->attach($data['roles']);
+
     }
 }

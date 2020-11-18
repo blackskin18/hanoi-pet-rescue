@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\AnimalController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\PlaceController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,3 +31,5 @@ Route::post('/auth/verify-token', [AuthController::class, 'verify']);
 Route::apiResource('/cases', AnimalController::class);
 Route::apiResource('/statuses', StatusController::class);
 Route::apiResource('/places', PlaceController::class);
+Route::apiResource('/roles', RoleController::class);
+Route::apiResource('/users', UserController::class);

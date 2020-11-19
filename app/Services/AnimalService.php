@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AnimalImage;
 use App\Models\Animal;
+use App\Models\Place;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 
@@ -11,22 +12,32 @@ class AnimalService
 {
     public function createAnimal($data)
     {
-        $images = $data['images'];
+        $images = $data['images'] ?? [];
         $code = $this->generateCode();
+
+        if($data['place_type'] == Place::FOSTER) {
+            $fosterId = $data['place_id'];
+            $placeId = null;
+        } else {
+            $fosterId = null;
+            $placeId = $data['place_id'];
+        }
 
         // insert animal
         $animal = Animal::create([
             'code' => $code,
             'name' => $data['name'],
-            'description' => $data['description'],
+            'description' => $data['description'] ?? '',
             'status' => $data['status'],
             'type' => $data['type'],
-            'receice_place' => $data['receice_place'],
-            'receive_date' => $data['receive_date'],
-            'place' => $data['place'],
-            'date_of_birth' => $this->detectBirth($data['age_year'], $data['age_month']),
-            'note' => $data['note'],
-            'created_by' => 6,
+            'receive_place' => $data['receive_place'] ?? '',
+            'receive_date' => $data['receive_date'] ?? '',
+            //'place' => $data['place'],
+            //'date_of_birth' => $this->detectBirth($data['age_year'], $data['age_month']),
+            'note' => $data['note'] ?? '',
+            'foster_id' => $fosterId,
+            'place_id' => $placeId,
+            'created_by' => Auth()->user()->id,
         ]);
 
         // insert images

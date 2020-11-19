@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Animal;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Services\AnimalService;
@@ -13,7 +14,7 @@ class AnimalController extends Controller
 
     public function __construct(AnimalService $animalService)
     {
-        $this->middleware('jwt-authen');
+        //$this->middleware('jwt-authen');
         $this->animalService = $animalService;
     }
 

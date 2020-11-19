@@ -27,6 +27,10 @@ class Animal extends Model
         'statuses.name',
         'date_of_birth',
         'created_by',
+        'place_id',
+        'foster_id',
+        'receive_date',
+        'receive_place'
     ];
 
     public function animalImage()
@@ -37,5 +41,13 @@ class Animal extends Model
     public function status()
     {
         return $this->hasOne('App\Models\Status', 'id', 'status');
+    }
+
+    public function place() {
+        return $this->belongsTo('App\Models\Place');
+    }
+
+    public function foster() {
+        return $this->belongsTo('App\Models\User');
     }
 }

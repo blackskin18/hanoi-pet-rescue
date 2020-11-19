@@ -23,11 +23,8 @@ class UserController extends Controller
     public function index()
     {
         if(request()->get('type') == Place::FOSTER) {
-            $places = $this->userService->getFoster(request()->all());
-            $total = $this->userService->getTotalFoster(request()->all());
+
         } else {
-            $places = $this->placeService->getPlaces(request()->all());
-            $total = $this->placeService->getTotalPlaces(request()->all());
         }
 
         return $this->responseSuccess(['places' => $places, 'total' => $total]);

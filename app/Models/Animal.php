@@ -10,13 +10,25 @@ class Animal extends Model
     //public static $limitDefault = 20;
     const LIMIT_DEFAULT = 20;
 
+    const GENDER_M = 1;
+
+    const GENDER_F = 2;
+
+    const GENDER_O = 3;
+
+    const TYPE_DOG = 1;
+
+    const TYPE_CAT = 2;
+
+    const TYPE_OTHER = 3;
+
     public $table = "animals";
 
     protected $fillable = [
         'id',
         'code',
+        'code_full',
         'name',
-        'input_date',
         'age',
         'description',
         'address',
@@ -30,7 +42,8 @@ class Animal extends Model
         'place_id',
         'foster_id',
         'receive_date',
-        'receive_place'
+        'receive_place',
+        'gender'
     ];
 
     public function animalImage()
@@ -43,11 +56,13 @@ class Animal extends Model
         return $this->hasOne('App\Models\Status', 'id', 'status');
     }
 
-    public function place() {
+    public function place()
+    {
         return $this->belongsTo('App\Models\Place');
     }
 
-    public function foster() {
+    public function foster()
+    {
         return $this->belongsTo('App\Models\User');
     }
 }

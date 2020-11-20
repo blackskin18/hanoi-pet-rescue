@@ -70,10 +70,61 @@ class UserService
             'phone' => $data['phone'] ?? '',
             'address' => $data['address'] ?? '',
             'email' => $data['email'],
-            "note" => $data['note'] ?? ''
+            "note" => $data['note'] ?? '',
         ]);
 
         $user->roles()->attach($data['roles']);
+    }
 
+    public function getUsers($data)
+    {
+        $page = (isset($data['page']) && $data['page'] >= 1) ? $data['page'] : 1;
+        $users = User::offset(($page - 1) * self::LIMIT);
+
+        //search
+        $users = $this->filterUsers($users, $data);
+        $users = $users->with('roles')->limit(self::LIMIT)->get();
+
+        return $users;
+    }
+
+    private function filterUsers($users, $data)
+    {
+
+        if (isset($data['type']) && $data['type'] == User::FOSTER) {
+            $roleIds = User::FOSTER_IDS;
+        } elseif (isset($data['type']) && $data['type'] == User::MEDICAL) {
+            $roleIds = User::MEDICAL_IDS;
+        } elseif (isset($data['type']) && $data['type'] == User::VOLUNTEER) {
+            $roleIds = User::VOLUNTEER_IDS;
+        } else {
+            $roleIds = null;
+        }
+
+        if ($roleIds) {
+            $users = User::whereHas('roles', function ($query) use ($roleIds) {
+                $query->whereIn('role_id', $roleIds);
+            });
+        }
+
+        if (isset($data['name']) && $data['name'] !== '') {
+            $users->where('name', 'like', '%'.$data['name'].'%');
+        }
+        if (isset($data['phone']) && $data['phone'] !== '') {
+            $users->where('phone', 'like', '%'.$data['phone'].'%');
+        }
+        if (isset($data['address']) && $data['address'] !== '') {
+            $users->where('address', 'like', '%'.$data['address'].'%');
+        }
+
+        return $users;
+    }
+
+    public function getTotalUsers($data)
+    {
+        $places = User::where('id', '!=', null)->get();
+        $places = $this->filterUsers($places, $data);
+
+        return $places->count();
     }
 }

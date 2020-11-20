@@ -13,9 +13,11 @@ class AnimalService
     public function createAnimal($data)
     {
         $images = $data['images'] ?? [];
-        $code = $this->generateCode();
+        //$code
+        $code = isset($data['code']) && $data['code'] ? $data['code'] : Animal::max('code');
+        $codeFull = $this->generateCode($data, $code);
 
-        if($data['place_type'] == Place::FOSTER) {
+        if ($data['place_type'] == Place::FOSTER) {
             $fosterId = $data['place_id'];
             $placeId = null;
         } else {
@@ -26,14 +28,15 @@ class AnimalService
         // insert animal
         $animal = Animal::create([
             'code' => $code,
+            'code_full' => $codeFull,
             'name' => $data['name'],
             'description' => $data['description'] ?? '',
             'status' => $data['status'],
             'type' => $data['type'],
             'receive_place' => $data['receive_place'] ?? '',
             'receive_date' => $data['receive_date'] ?? '',
-            //'place' => $data['place'],
-            //'date_of_birth' => $this->detectBirth($data['age_year'], $data['age_month']),
+            'gender' => $data['gender'],
+            'date_of_birth' => $this->detectBirth($data['age_year'], $data['age_month']),
             'note' => $data['note'] ?? '',
             'foster_id' => $fosterId,
             'place_id' => $placeId,
@@ -42,7 +45,7 @@ class AnimalService
 
         // insert images
         foreach ($images as $image) {
-            $path = Storage::disk('public')->put('animal_image/' . $animal->id, $image);
+            $path = Storage::disk('public')->put('animal_image/'.$animal->id, $image);
             $filename = explode('/', $path)[count(explode('/', $path)) - 1];
 
             $animal->animalImage()->create([
@@ -70,7 +73,7 @@ class AnimalService
         // get full image url
         $animals = $animals->map(function ($animal) {
             $animal->animalImage = $animal->animalImage->map(function ($image) {
-                $image->path = url('storage/animal_image/' . $image->animal_id . '/' . $image->file_name);
+                $image->path = url('storage/animal_image/'.$image->animal_id.'/'.$image->file_name);
 
                 return $image;
             });
@@ -93,18 +96,19 @@ class AnimalService
         return $animals->count();
     }
 
-    private function filterAnimal($animals, $data) {
+    private function filterAnimal($animals, $data)
+    {
         if (isset($data['code']) && $data['code'] !== '') {
-            $animals->where('code', 'like', '%' . $data['code'] . '%');
+            $animals->where('code', 'like', '%'.$data['code'].'%');
         }
         if (isset($data['description']) && $data['description'] !== '') {
-            $animals->where('description', 'like', '%' . $data['description'] . '%');
+            $animals->where('description', 'like', '%'.$data['description'].'%');
         }
         if (isset($data['note']) && $data['note'] !== '') {
-            $animals->where('note', 'like', '%' . $data['note'] . '%');
+            $animals->where('note', 'like', '%'.$data['note'].'%');
         }
         if (isset($data['name']) && $data['name'] !== '') {
-            $animals->where('name', 'like', '%' . $data['name'] . '%');
+            $animals->where('name', 'like', '%'.$data['name'].'%');
         }
         if (isset($data['status']) && $data['status'] !== '') {
             $animals->whereIn('status', $data['status']);
@@ -115,12 +119,17 @@ class AnimalService
         if (isset($data['receive_date_end']) && $data['receive_date_end'] !== '') {
             $animals->where('receive_date', '<=', $data['receive_date_end']);
         }
+
         return $animals;
     }
 
-    private function generateCode()
+    private function generateCode($data, $code)
     {
-        return Animal::max('code') + 1;
+        $year = substr((new Carbon($data['receive_date']))->year, 2);
+        $type = $data['type'] == Animal::TYPE_DOG ? 'D' : ($data['type'] == Animal::TYPE_CAT ? 'C' : 'O');
+        $gender = $data['gender'] == Animal::GENDER_M ? 'M' : ($data['gender'] == Animal::GENDER_F ? 'F' : 'O');
+
+        return $year . $type . $gender . $code;
     }
 
     private function detectBirth($year, $month)

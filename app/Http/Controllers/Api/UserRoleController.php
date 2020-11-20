@@ -9,7 +9,7 @@ use App\Models\Place;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 
-class UserController extends Controller
+class UserRoleController extends Controller
 {
     private $placeService;
     private $userService;
@@ -23,8 +23,9 @@ class UserController extends Controller
 
     public function index()
     {
+        var_dump(1);die;
         $users = $this->userService->getUsers(request()->all());
-        $total = $this->userService->getTotalUsers(request()->all());
+        $total = $this->userService->getUsers(request()->all());
 
         return $this->responseSuccess(['users' => $users, 'total' => $total]);
     }

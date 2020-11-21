@@ -72,4 +72,22 @@ class PlaceService
 
         return $places->count();
     }
+
+    public function getPlaceBtId($placeId)
+    {
+        return Place::with(['parent', 'children'])->find($placeId);
+    }
+
+    public function deleteById($userId) {
+        $place = Place::with(['animals', 'children'])->find($userId);
+        if(count($place->animals) > 0) {
+            return 'Đang có Case ở địa điểm này, nên không thể xóa';
+        }
+        if(count($place->children) > 0) {
+            return 'Địa điểm này đang có chi nhánh, vui lòng xóa chi nhánh trước';
+        } else {
+            $place->delete();
+            return true;
+        }
+    }
 }

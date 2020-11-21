@@ -8,10 +8,12 @@ use App\Services\PlaceService;
 use App\Models\Place;
 use App\Services\UserService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
     private $placeService;
+
     private $userService;
 
     public function __construct(PlaceService $placeService, UserService $userService)
@@ -43,4 +45,23 @@ class UserController extends Controller
         return $this->responseSuccess();
     }
 
+    public function show($userId)
+    {
+        $user = $this->userService->getUserById($userId);
+
+        return $this->responseSuccess($user);
+    }
+
+    public function destroy($userId)
+    {
+        try {
+            $result = $this->userService->deleteById($userId);
+
+            return $result === true ? $this->responseSuccess() : $this->responseError($result);
+        } catch (\Exception $e) {
+            Log::error($e);
+
+            return $this->responseError('Delete Error');
+        }
+    }
 }

@@ -27,4 +27,12 @@ class Place extends Model
     public function parent() {
         return $this->belongsTo('App\Models\Place', 'parent_id', 'id');
     }
+
+    public function children() {
+        return $this->hasMany('App\Models\Place', 'parent_id', 'id');
+    }
+
+    public function animals() {
+        return $this->hasMany('App\Models\Animal', 'place_id', 'id');
+    }
 }

@@ -36,6 +36,9 @@ class AnimalService
             'receive_place' => $data['receive_place'] ?? '',
             'receive_date' => $data['receive_date'] ?? '',
             'gender' => $data['gender'],
+            'owner_name' => $data['owner_name'] ?? '',
+            'owner_phone' => $data['owner_phone'] ?? '',
+            'owner_address' => $data['owner_address'] ?? '',
             'date_of_birth' => $this->detectBirth($data['age_year'], $data['age_month']),
             'note' => $data['note'] ?? '',
             'foster_id' => $fosterId,
@@ -139,5 +142,21 @@ class AnimalService
         $date->sub($month, 'month');
 
         return $date->isoFormat('Y-M-D');
+    }
+
+    public function getAnimalById($id) {
+        $animal = Animal::with(['status', 'animalImage', 'foster', 'place'])->find($id);
+
+        $animal->animal_image = $animal->animalImage->map(function ($image) {
+            $image->path = url('storage/animal_image/'.$image->animal_id.'/'.$image->file_name);
+
+            return $image;
+        });
+
+        return $animal;
+    }
+
+    public function deleteById($id) {
+        Animal::find($id)->delete();
     }
 }

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use App\Models\RoleUser;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -66,6 +67,23 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'remember_token',
     ];
+
+    public static function boot() {
+        parent::boot();
+
+        static::deleting(function($user) { // before delete() method call this
+            RoleUser::where('user_id', $user->id)->delete();
+        });
+    }
+
+    public function animals() {
+        return $this->hasMany('App\Models\Animal','foster_id', 'id');
+    }
+
+
+    public function animalCreated() {
+        return $this->hasMany('App\Models\Animal','created_by', 'id');
+    }
 
     public function roles()
     {

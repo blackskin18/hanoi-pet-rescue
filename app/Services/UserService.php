@@ -127,4 +127,21 @@ class UserService
 
         return $places->count();
     }
+
+    public function getUserById($userId) {
+        return User::with('roles')->find($userId);
+    }
+
+    public function deleteById($userId) {
+        $user = User::with(['animals', 'roles', 'animalCreated'])->find($userId);
+        if(count($user->animals) > 0) {
+            return 'Đang có Case ở nhà chủ tài khoản này, nên ko thể xóa';
+        }
+        if(count($user->animalCreated) > 0) {
+            return 'Tài khoản này đã từng tạo case, nên không thể xóa';
+        } else {
+            $user->delete();
+            return true;
+        }
+    }
 }

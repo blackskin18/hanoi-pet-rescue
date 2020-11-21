@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\AnimalDeleted;
 use Illuminate\Database\Eloquent\Model;
 use App\AnimalImage;
 
@@ -43,8 +44,19 @@ class Animal extends Model
         'foster_id',
         'receive_date',
         'receive_place',
-        'gender'
+        'gender',
+        'owner_name',
+        'owner_phone',
+        'owner_address'
     ];
+
+    public static function boot() {
+        parent::boot();
+
+        static::deleting(function($animal) { // before delete() method call this
+            $animal->animalImage()->delete();
+        });
+    }
 
     public function animalImage()
     {

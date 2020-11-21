@@ -16,9 +16,15 @@ trait BaseApiResponse
         return response()->json($response, 200);
     }
 
-    public function responseError()
+    public function responseError($message = '')
     {
+        $response = [
+            'code' => -1,
+            'success' => false,
+            'message' => $message
+        ];
 
+        return response()->json($response, 400);
     }
 
     public function responseForbidden()

@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Animal;
-use Illuminate\Http\Request;
+use App\Models\Place;
+use App\Models\User;
 use App\Http\Controllers\Controller;
 use App\Services\AnimalService;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AnimalController extends Controller
 {
@@ -33,6 +33,41 @@ class AnimalController extends Controller
         return $this->responseSuccess();
     }
 
+    public function show($animalId)
+    {
+        $animal = $this->animalService->getAnimalById($animalId);
+
+        return $this->responseSuccess($animal);
+    }
+
+    public function destroy($animalId)
+    {
+        try {
+            $this->animalService->deleteById($animalId);
+
+            return $this->responseSuccess($animalId);
+        } catch (\Exception $e) {
+            Log::error($e);
+
+            return $this->responseError('Xóa Case thất bại, vui lòng liên hệ kỹ thuật !!');
+        }
+    }
+
+    public function test($animalId)
+    {
+        $place = Place::with('animal')->find(1);
+        return $place;
+
+        //try {
+        //    $this->animalService->deleteById($animalId);
+        //
+        //    return $this->responseSuccess();
+        //} catch (\Exception $e) {
+        //    Log::error($e);
+        //
+        //    return $this->responseError('Delete Error');
+        //}
+    }
 
 
     //public function getAnimalInfo($code)

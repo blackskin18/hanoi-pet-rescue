@@ -7,6 +7,7 @@ use App\Models\Animal;
 use App\Models\Place;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class AnimalService
 {
@@ -43,6 +44,7 @@ class AnimalService
             'note' => $data['note'] ?? '',
             'foster_id' => $fosterId,
             'place_id' => $placeId,
+            'place_type' => $data['place_type'],
             'created_by' => Auth()->user()->id,
         ]);
 
@@ -132,7 +134,7 @@ class AnimalService
         $type = $data['type'] == Animal::TYPE_DOG ? 'D' : ($data['type'] == Animal::TYPE_CAT ? 'C' : 'O');
         $gender = $data['gender'] == Animal::GENDER_M ? 'M' : ($data['gender'] == Animal::GENDER_F ? 'F' : 'O');
 
-        return $year . $type . $gender . $code;
+        return $year.$type.$gender.$code;
     }
 
     private function detectBirth($year, $month)
@@ -144,7 +146,8 @@ class AnimalService
         return $date->isoFormat('Y-M-D');
     }
 
-    public function getAnimalById($id) {
+    public function getAnimalById($id)
+    {
         $animal = Animal::with(['status', 'animalImage', 'foster', 'place'])->find($id);
 
         $animal->animal_image = $animal->animalImage->map(function ($image) {
@@ -156,7 +159,28 @@ class AnimalService
         return $animal;
     }
 
-    public function deleteById($id) {
+    public function deleteById($id)
+    {
         Animal::find($id)->delete();
+    }
+
+    public function getReportData($startTime, $endTime)
+    {
+        $reportStatus = DB::table('animals')
+            ->selectRaw('type, status, count(*) as count')
+            ->whereBetween('receive_date', [$startTime, $endTime])
+            ->groupBy(['type','status'])
+            ->get();
+
+        $reportPlace = DB::table('animals')
+            ->whereBetween('receive_date', [$startTime, $endTime])
+            ->selectRaw('type, place_type, count(*) as count')
+            ->groupBy(['type','place_type'])
+            ->get();
+
+        return [
+            'report_by_status' => $reportStatus,
+            'report_by_place' => $reportPlace,
+        ];
     }
 }

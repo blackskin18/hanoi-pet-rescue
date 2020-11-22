@@ -6,6 +6,7 @@ use App\Services\UserService;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Google_Client;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -33,6 +34,7 @@ class AuthController extends Controller
 
         $client = new Google_Client(['client_id' => '904910057330-6gbn36bltbl6qq89ddvpm5j0lhb6nu4q.apps.googleusercontent.com']);  // Specify the CLIENT_ID of the app that accesses the backend
         $payload = $client->verifyIdToken($tokenId);
+        Log::info($payload);
         if ($payload) {
             $user = $this->userService->verifyUser($payload['email'], $payload['sub']);
             if (!$user) {

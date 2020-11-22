@@ -6,6 +6,7 @@ use App\Models\Place;
 use App\Models\User;
 use App\Http\Controllers\Controller;
 use App\Services\AnimalService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class AnimalController extends Controller
@@ -49,14 +50,29 @@ class AnimalController extends Controller
         } catch (\Exception $e) {
             Log::error($e);
 
-            return $this->responseError('Xóa Case thất bại, vui lòng liên hệ kỹ thuật !!');
+            return $this->responseError('Xóa Case th ất bại, vui lòng liên hệ kỹ thuật !!');
         }
+    }
+
+
+    public function getReport()
+    {
+        $reportData = $this->animalService->getReportData(request()->get('start_time'), request()->get('end_time'));
+        return $this->responseSuccess($reportData);
     }
 
     public function test($animalId)
     {
-        $place = Place::with('animal')->find(1);
-        return $place;
+        //$place = Place::with('animal')->find(1);
+        //return $place;
+        var_dump(1);die;
+
+        //DB::table('animals')
+        //    ->update(['place_type' => DB::raw("(CASE
+        //    WHEN `place`='commonHome' THEN 2
+        //    WHEN `place`='volunteer' THEN 3
+        //    WHEN `place`='hospital' THEN 1
+        //    ELSE null END)")]);
 
         //try {
         //    $this->animalService->deleteById($animalId);

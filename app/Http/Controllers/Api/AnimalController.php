@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Place;
-use App\Models\User;
 use App\Http\Controllers\Controller;
 use App\Services\AnimalService;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Http\Requests\StoreAnimal;
 
 class AnimalController extends Controller
 {
@@ -27,7 +25,7 @@ class AnimalController extends Controller
         return $this->responseSuccess(['cases' => $animals, 'total' => $total]);
     }
 
-    public function store()
+    public function store(StoreAnimal $request)
     {
         $this->animalService->createAnimal(request()->all());
 

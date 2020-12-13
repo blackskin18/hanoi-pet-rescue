@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Services\PlaceService;
-use App\Models\Place;
+use App\Http\Requests\StorePlace;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -24,13 +24,13 @@ class PlaceController extends Controller
 
     public function index()
     {
-        if (request()->get('type') == Place::FOSTER) {
-            $places = $this->userService->getFoster(request()->all());
-            $total = $this->userService->getTotalFoster(request()->all());
-        } else {
-            $places = $this->placeService->getPlaces(request()->all());
-            $total = $this->placeService->getTotalPlaces(request()->all());
-        }
+        //if (request()->get('type') == Place::FOSTER) {
+        //    $places = $this->userService->getFoster(request()->all());
+        //    $total = $this->userService->getTotalFoster(request()->all());
+        //} else {
+        $places = $this->placeService->getPlaces(request()->all());
+        $total = $this->placeService->getTotalPlaces(request()->all());
+        //}
 
         return $this->responseSuccess(['places' => $places, 'total' => $total]);
     }
@@ -42,7 +42,7 @@ class PlaceController extends Controller
         return $this->responseSuccess($hospitals);
     }
 
-    public function store()
+    public function store(StorePlace $request)
     {
         $this->placeService->createPlace(request()->all());
 

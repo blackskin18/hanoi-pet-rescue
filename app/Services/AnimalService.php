@@ -42,7 +42,8 @@ class AnimalService
             'owner_address' => $data['owner_address'] ?? '',
             'date_of_birth' => $this->detectBirth($data['age_year'], $data['age_month']),
             'note' => $data['note'] ?? '',
-            'foster_id' => $fosterId,
+            'foster_id' => $data['foster_id'] ?? 0,
+            'owner_id' => $data['owner_id'] ?? 0,
             'place_id' => $placeId,
             'place_type' => $data['place_type'],
             'created_by' => Auth()->user()->id,
@@ -114,6 +115,9 @@ class AnimalService
         }
         if (isset($data['name']) && $data['name'] !== '') {
             $animals->where('name', 'like', '%'.$data['name'].'%');
+        }
+        if (isset($data['place']) && $data['place'] !== '') {
+            $animals->where('place_id', $data['place']);
         }
         if (isset($data['status']) && $data['status'] !== '') {
             $animals->whereIn('status', $data['status']);

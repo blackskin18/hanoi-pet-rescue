@@ -11,7 +11,7 @@ class PlaceService
 
     public function createPlace($data)
     {
-        // insert animal
+        // insert Place
         Place::create([
             'type' => $data['type'],
             'name' => $data['name'],
@@ -33,6 +33,10 @@ class PlaceService
 
     public function getPlaces($data)
     {
+        if(isset($data['all']) && $data['all'] === "true") {
+            return Place::where('type', $data['type'])->get();
+        }
+
         $page = (isset($data['page']) && $data['page'] >= 1) ? $data['page'] : 1;
 
         $places = Place::where('type', $data['type'])->offset(($page - 1) * self::LIMIT);
@@ -40,6 +44,8 @@ class PlaceService
         if ($data['type'] == Place::HOSPITAL) {
             $places = $places->with('parent');
         }
+
+        $places = $places->with('animals');
 
         //search
         $places = $this->filterPlaces($places, $data);

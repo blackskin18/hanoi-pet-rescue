@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
@@ -30,22 +31,26 @@ class AuthController extends Controller
      */
     public function login()
     {
-        $tokenId = request('tokenId');
+        $user = User::find(92);
+        $token = auth()->login($user);
+        return $this->respondWithToken($token);
 
-        $client = new Google_Client(['client_id' => '904910057330-6gbn36bltbl6qq89ddvpm5j0lhb6nu4q.apps.googleusercontent.com']);  // Specify the CLIENT_ID of the app that accesses the backend
-        $payload = $client->verifyIdToken($tokenId);
-        Log::info($payload);
-        if ($payload) {
-            $user = $this->userService->verifyUser($payload['email'], $payload['sub']);
-            if (!$user) {
-                return $this->responseForbidden();
-            }
-
-            $token = auth()->login($user);
-            return $this->respondWithToken($token);
-        } else {
-            return $this->responseForbidden();
-        }
+        //$tokenId = request('tokenId');
+        //
+        //$client = new Google_Client(['client_id' => '904910057330-6gbn36bltbl6qq89ddvpm5j0lhb6nu4q.apps.googleusercontent.com']);  // Specify the CLIENT_ID of the app that accesses the backend
+        //$payload = $client->verifyIdToken($tokenId);
+        //Log::info($payload);
+        //if ($payload) {
+        //    $user = $this->userService->verifyUser($payload['email'], $payload['sub']);
+        //    if (!$user) {
+        //        return $this->responseForbidden();
+        //    }
+        //
+        //    $token = auth()->login($user);
+        //    return $this->respondWithToken($token);
+        //} else {
+        //    return $this->responseForbidden();
+        //}
     }
 
     /**

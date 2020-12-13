@@ -61,6 +61,57 @@ class AnimalService
         }
     }
 
+    public function editAnimal($data, $id)
+    {
+        $images = $data['images_add'] ?? [];
+        $oldImages = $data['old_images'] ?? [];
+        $code = isset($data['code']) && $data['code'] ? $data['code'] : Animal::max('code');
+        $codeFull = $this->generateCode($data, $code);
+        $placeId = $data['place_id'];
+
+
+        $animal = Animal::find($id);
+        Animal::find($id)->update([
+            'code' => $code,
+            'code_full' => $codeFull,
+            'name' => $data['name'],
+            'description' => $data['description'] ?? '',
+            'status' => $data['status'],
+            'type' => $data['type'],
+            'receive_place' => $data['receive_place'] ?? '',
+            'receive_date' => $data['receive_date'] ?? '',
+            'gender' => $data['gender'],
+            'owner_name' => $data['owner_name'] ?? '',
+            'owner_phone' => $data['owner_phone'] ?? '',
+            'owner_address' => $data['owner_address'] ?? '',
+            'date_of_birth' => $this->detectBirth($data['age_year'], $data['age_month']),
+            'note' => $data['note'] ?? '',
+            'foster_id' => $data['foster_id'] ?? 0,
+            'owner_id' => $data['owner_id'] ?? 0,
+            'place_id' => $placeId,
+            'place_type' => $data['place_type'],
+        ]);
+
+
+        // insert images
+        foreach ($images as $image) {
+            $path = Storage::disk('public')->put('animal_image/'.$id, $image);
+            $filename = explode('/', $path)[count(explode('/', $path)) - 1];
+
+            $animal->animalImage()->create([
+                'file_name' => $filename,
+                'created_by' => 6,
+            ]);
+        }
+
+        // delete image
+        $oldImages = collect($oldImages)->map(function ($image) {
+            $arr = explode('/', $image);
+            return $arr[count($arr) - 1];
+        });
+        AnimalImage::where('animal_id', $id)->whereNotIn('file_name', $oldImages)->delete();
+    }
+
     public function getListAnimalsByType($data)
     {
         $limit = isset($data['limit']) && $data['limit'] != '' ? $data['limit'] : Animal::LIMIT_DEFAULT;

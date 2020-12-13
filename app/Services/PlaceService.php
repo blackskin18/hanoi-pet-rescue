@@ -31,8 +31,38 @@ class PlaceService
             ->get();
     }
 
+    public function getHospitals($data) {
+        $page = (isset($data['page']) && $data['page'] >= 1) ? $data['page'] : 1;
+
+        $places = Place::where('type', Place::HOSPITAL)->where('parent_id', null)->offset(($page - 1) * self::LIMIT)
+                ->with('children.animals')
+                ->with('animals');
+
+        //search
+        $places = $this->filterPlaces($places, $data);
+        $places = $places->limit(self::LIMIT)->get();
+
+        $places->map(function ($place) {
+            $place->key = $place->id;
+            $place->children->map(function ($child) {
+                $child->key = $child->id;
+                return $child;
+            });
+            if(count($place->children) ===0) {
+                unset($place->children);
+            }
+
+            return $place;
+        });
+        return $places;
+    }
+
     public function getPlaces($data)
     {
+        if ($data['type'] && $data['type'] == Place::HOSPITAL) {
+            return $this->getHospitals($data);
+        }
+
         if(isset($data['all']) && $data['all'] === "true") {
             return Place::where('type', $data['type'])->get();
         }
@@ -41,9 +71,7 @@ class PlaceService
 
         $places = Place::where('type', $data['type'])->offset(($page - 1) * self::LIMIT);
 
-        if ($data['type'] == Place::HOSPITAL) {
-            $places = $places->with('parent');
-        }
+
 
         $places = $places->with('animals');
 

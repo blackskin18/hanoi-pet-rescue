@@ -42,6 +42,13 @@ class PlaceController extends Controller
         return $this->responseSuccess($hospitals);
     }
 
+    public function getHospitals()
+    {
+        $hospitals = $this->placeService->getHospitals(request()->all());
+
+        return $this->responseSuccess($hospitals);
+    }
+
     public function store(StorePlace $request)
     {
         $this->placeService->createPlace(request()->all());

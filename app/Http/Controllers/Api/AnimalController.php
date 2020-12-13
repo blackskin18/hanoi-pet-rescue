@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Services\AnimalService;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\StoreAnimal;
+use Illuminate\Http\Request;
+
 
 class AnimalController extends Controller
 {
@@ -52,6 +54,13 @@ class AnimalController extends Controller
         }
     }
 
+
+    public function update(Request $request, $id)
+    {
+        $this->animalService->editAnimal(request()->all(), $id);
+
+        return $this->responseSuccess();
+    }
 
     public function getReport()
     {

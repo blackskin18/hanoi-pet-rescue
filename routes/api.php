@@ -28,6 +28,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::get('/animal-test/{id}', [AnimalController::class, 'test']);
 
 Route::get('/places/root-hospitals', [PlaceController::class, 'getRootHospitals']);
+Route::get('/places/hospitals', [PlaceController::class, 'getHospitals']);
 Route::get('/cases/report', [AnimalController::class, 'getReport']);
 Route::post('/auth/login', [AuthController::class, 'login'])->name('login');
 Route::post('/auth/verify-token', [AuthController::class, 'verify']);

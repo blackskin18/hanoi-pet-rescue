@@ -4,61 +4,57 @@ namespace App\Services;
 
 use App\Models\AnimalImage;
 use App\Models\Animal;
+use App\Models\History;
 use App\Models\Place;
+use App\Services\HistoryService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
 class AnimalService
 {
+    private $historyService;
+
+    public function __construct(HistoryService $historyService)
+    {
+        $this->historyService = $historyService;
+    }
+
     public function createAnimal($data)
     {
         $images = $data['images'] ?? [];
-        //$code
         $code = isset($data['code']) && $data['code'] ? $data['code'] : Animal::max('code');
         $codeFull = $this->generateCode($data, $code);
-
-        if ($data['place_type'] == Place::FOSTER) {
-            $fosterId = $data['place_id'];
-            $placeId = null;
-        } else {
-            $fosterId = null;
-            $placeId = $data['place_id'];
-        }
+        $placeId = $data['place_id'];
 
         // insert animal
         $animal = Animal::create([
-            'code' => $code,
-            'code_full' => $codeFull,
-            'name' => $data['name'],
-            'description' => $data['description'] ?? '',
-            'status' => $data['status'],
-            'type' => $data['type'],
+            'code'          => $code,
+            'code_full'     => $codeFull,
+            'name'          => $data['name'],
+            'description'   => $data['description'] ?? '',
+            'status'        => $data['status'],
+            'type'          => $data['type'],
             'receive_place' => $data['receive_place'] ?? '',
-            'receive_date' => $data['receive_date'] ?? '',
-            'gender' => $data['gender'],
-            'owner_name' => $data['owner_name'] ?? '',
-            'owner_phone' => $data['owner_phone'] ?? '',
+            'receive_date'  => $data['receive_date'] ?? '',
+            'gender'        => $data['gender'],
+            'owner_name'    => $data['owner_name'] ?? '',
+            'owner_phone'   => $data['owner_phone'] ?? '',
             'owner_address' => $data['owner_address'] ?? '',
             'date_of_birth' => $this->detectBirth($data['age_year'], $data['age_month']),
-            'note' => $data['note'] ?? '',
-            'foster_id' => $data['foster_id'] ?? 0,
-            'owner_id' => $data['owner_id'] ?? 0,
-            'place_id' => $placeId,
-            'place_type' => $data['place_type'],
-            'created_by' => Auth()->user()->id,
+            'note'          => $data['note'] ?? '',
+            'foster_id'     => $data['foster_id'] ?? 0,
+            'owner_id'      => $data['owner_id'] ?? 0,
+            'place_id'      => $placeId,
+            'place_type'    => $data['place_type'],
+            'created_by'    => Auth()->user()->id,
         ]);
 
         // insert images
-        foreach ($images as $image) {
-            $path = Storage::disk('public')->put('animal_image/'.$animal->id, $image);
-            $filename = explode('/', $path)[count(explode('/', $path)) - 1];
+        $this->insertImages($animal, $images);
 
-            $animal->animalImage()->create([
-                'file_name' => $filename,
-                'created_by' => 6,
-            ]);
-        }
+        // log history
+        $this->historyService->createCase($animal->id);
     }
 
     public function editAnimal($data, $id)
@@ -69,47 +65,70 @@ class AnimalService
         $codeFull = $this->generateCode($data, $code);
         $placeId = $data['place_id'];
 
-
+        //update animal data
         $animal = Animal::find($id);
         Animal::find($id)->update([
-            'code' => $code,
-            'code_full' => $codeFull,
-            'name' => $data['name'],
-            'description' => $data['description'] ?? '',
-            'status' => $data['status'],
-            'type' => $data['type'],
+            'code'          => $code,
+            'code_full'     => $codeFull,
+            'name'          => $data['name'],
+            'description'   => $data['description'] ?? '',
+            'status'        => $data['status'],
+            'type'          => $data['type'],
             'receive_place' => $data['receive_place'] ?? '',
-            'receive_date' => $data['receive_date'] ?? '',
-            'gender' => $data['gender'],
-            'owner_name' => $data['owner_name'] ?? '',
-            'owner_phone' => $data['owner_phone'] ?? '',
+            'receive_date'  => $data['receive_date'] ?? '',
+            'gender'        => $data['gender'],
+            'owner_name'    => $data['owner_name'] ?? '',
+            'owner_phone'   => $data['owner_phone'] ?? '',
             'owner_address' => $data['owner_address'] ?? '',
             'date_of_birth' => $this->detectBirth($data['age_year'], $data['age_month']),
-            'note' => $data['note'] ?? '',
-            'foster_id' => $data['foster_id'] ?? 0,
-            'owner_id' => $data['owner_id'] ?? 0,
-            'place_id' => $placeId,
-            'place_type' => $data['place_type'],
+            'note'          => $data['note'] ?? '',
+            'foster_id'     => $data['foster_id'] ?? 0,
+            'owner_id'      => $data['owner_id'] ?? 0,
+            'place_id'      => $placeId,
+            'place_type'    => $data['place_type'],
         ]);
 
+        // delete image
+        $this->deleteImages($oldImages, $id);
 
         // insert images
+        $this->insertImages($animal, $images, true);
+
+        // log edit animal
+        $newAnimal = Animal::find($id);
+        $this->historyService->editAnimal($animal, $newAnimal);
+    }
+
+    private function deleteImages($oldImages, $animalId)
+    {
+        $oldImages = collect($oldImages)->map(function ($image) {
+            $arr = explode('/', $image);
+
+            return $arr[count($arr) - 1];
+        });
+
+        // log delete image
+        $imageToDelete = AnimalImage::where('animal_id', $animalId)->whereNotIn('file_name', $oldImages)->get();
+        $this->historyService->deleteImages($animalId, $imageToDelete);
+        AnimalImage::where('animal_id', $animalId)->whereNotIn('file_name', $oldImages)->delete();
+    }
+
+    private function insertImages($animal, $images, $addLog = false)
+    {
         foreach ($images as $image) {
-            $path = Storage::disk('public')->put('animal_image/'.$id, $image);
+            $path = Storage::disk('public')->put('animal_image/'.$animal->id, $image);
             $filename = explode('/', $path)[count(explode('/', $path)) - 1];
 
+            // log add image
+            if ($addLog) {
+                $this->historyService->saveLog($animal->id, 'image', '', $filename, History::NOTE_EDIT_ADD_IMAGE);
+            }
+
             $animal->animalImage()->create([
-                'file_name' => $filename,
+                'file_name'  => $filename,
                 'created_by' => 6,
             ]);
         }
-
-        // delete image
-        $oldImages = collect($oldImages)->map(function ($image) {
-            $arr = explode('/', $image);
-            return $arr[count($arr) - 1];
-        });
-        AnimalImage::where('animal_id', $id)->whereNotIn('file_name', $oldImages)->delete();
     }
 
     public function getListAnimalsByType($data)
@@ -221,21 +240,19 @@ class AnimalService
 
     public function getReportData($startTime, $endTime)
     {
-        $reportStatus = DB::table('animals')
-            ->selectRaw('type, status, count(*) as count')
-            ->whereBetween('receive_date', [$startTime, $endTime])
-            ->groupBy(['type','status'])
-            ->get();
+        $reportStatus = DB::table('animals')->selectRaw('type, status, count(*) as count')->whereBetween('receive_date', [
+                $startTime,
+                $endTime,
+            ])->groupBy(['type', 'status'])->get();
 
-        $reportPlace = DB::table('animals')
-            ->whereBetween('receive_date', [$startTime, $endTime])
-            ->selectRaw('type, place_type, count(*) as count')
-            ->groupBy(['type','place_type'])
-            ->get();
+        $reportPlace = DB::table('animals')->whereBetween('receive_date', [
+                $startTime,
+                $endTime,
+            ])->selectRaw('type, place_type, count(*) as count')->groupBy(['type', 'place_type'])->get();
 
         return [
             'report_by_status' => $reportStatus,
-            'report_by_place' => $reportPlace,
+            'report_by_place'  => $reportPlace,
         ];
     }
 }

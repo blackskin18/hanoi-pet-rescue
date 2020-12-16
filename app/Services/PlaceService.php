@@ -64,14 +64,12 @@ class PlaceService
         }
 
         if(isset($data['all']) && $data['all'] === "true") {
-            return Place::where('type', $data['type'])->get();
+            return Place::where('type', $data['type'])->where('parent_id', null)->with('children')->get();
         }
 
         $page = (isset($data['page']) && $data['page'] >= 1) ? $data['page'] : 1;
 
         $places = Place::where('type', $data['type'])->offset(($page - 1) * self::LIMIT);
-
-
 
         $places = $places->with('animals');
 

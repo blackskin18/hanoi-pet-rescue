@@ -25,7 +25,11 @@ class AnimalService
         $images = $data['images'] ?? [];
         $code = isset($data['code']) && $data['code'] ? $data['code'] : Animal::max('code');
         $codeFull = $this->generateCode($data, $code);
-        $placeId = $data['place_id'];
+        if(isset($data['branch_id']) && isset($data['place_id']) && $data['place_id'] && $data['branch_id']) {
+            $placeId = $data['branch_id'];
+        } else {
+            $placeId = $data['place_id'];
+        }
 
         // insert animal
         $animal = Animal::create([
@@ -63,7 +67,11 @@ class AnimalService
         $oldImages = $data['old_images'] ?? [];
         $code = isset($data['code']) && $data['code'] ? $data['code'] : Animal::max('code');
         $codeFull = $this->generateCode($data, $code);
-        $placeId = $data['place_id'];
+        if(isset($data['branch_id']) && isset($data['place_id']) && $data['place_id'] && $data['branch_id']) {
+            $placeId = $data['branch_id'];
+        } else {
+            $placeId = $data['place_id'];
+        }
 
         //update animal data
         $animal = Animal::find($id);

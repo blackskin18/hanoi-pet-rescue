@@ -45,9 +45,7 @@ class Animal extends Model
         'receive_date',
         'receive_place',
         'gender',
-        'owner_name',
-        'owner_phone',
-        'owner_address'
+        'owner_id',
     ];
 
     public static function boot() {
@@ -75,6 +73,10 @@ class Animal extends Model
 
     public function foster()
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo('App\Models\Place');
+    }
+    public function owner()
+    {
+        return $this->belongsTo('App\Models\Place');
     }
 }

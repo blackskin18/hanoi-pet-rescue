@@ -45,7 +45,7 @@ class AnimalService
             'owner_name'    => $data['owner_name'] ?? '',
             'owner_phone'   => $data['owner_phone'] ?? '',
             'owner_address' => $data['owner_address'] ?? '',
-            'date_of_birth' => $this->detectBirth($data['age_year'], $data['age_month']),
+            'date_of_birth' => $this->detectBirth($data['age_year'] ?? 0, $data['age_month'] ?? 0),
             'note'          => $data['note'] ?? '',
             'foster_id'     => $data['foster_id'] ?? 0,
             'owner_id'      => $data['owner_id'] ?? 0,
@@ -88,10 +88,10 @@ class AnimalService
             'owner_name'    => $data['owner_name'] ?? '',
             'owner_phone'   => $data['owner_phone'] ?? '',
             'owner_address' => $data['owner_address'] ?? '',
-            'date_of_birth' => $this->detectBirth($data['age_year'], $data['age_month']),
+            'date_of_birth' => $this->detectBirth($data['age_year'] ?? 0, $data['age_month'] ?? 0),
             'note'          => $data['note'] ?? '',
-            'foster_id'     => $data['foster_id'] ?? 0,
-            'owner_id'      => $data['owner_id'] ?? 0,
+            'foster_id'     => $data['foster_id'] ?? null,
+            'owner_id'      => $data['owner_id'] ?? null,
             'place_id'      => $placeId,
             'place_type'    => $data['place_type'],
         ]);
@@ -230,7 +230,7 @@ class AnimalService
 
     public function getAnimalById($id)
     {
-        $animal = Animal::with(['status', 'animalImage', 'foster', 'place'])->find($id);
+        $animal = Animal::with(['status', 'animalImage', 'foster', 'place', 'owner'])->find($id);
 
         $animal->animal_image = $animal->animalImage->map(function ($image) {
             $image->path = url('storage/animal_image/'.$image->animal_id.'/'.$image->file_name);

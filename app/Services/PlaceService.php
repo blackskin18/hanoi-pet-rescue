@@ -24,6 +24,19 @@ class PlaceService
         ]);
     }
 
+    public function updatePlace($data, $placeId)
+    {
+        Place::find($placeId)->update([
+            'name' => $data['name'],
+            'phone' => $data['phone'] ?? "",
+            'address' => $data['address'] ?? "",
+            'director_name' => $data['director_name'] ?? "",
+            'director_phone' => $data['director_phone'] ?? "",
+            "parent_id" => (isset($data['parent_id']) && $data['type'] = Place::HOSPITAL) ? $data['parent_id'] : null,
+            'note' => $data['note'] ?? ""
+        ]);
+    }
+
     public function getRootHospitals()
     {
         return Place::where('type', Place::HOSPITAL)

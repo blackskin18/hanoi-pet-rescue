@@ -5,8 +5,6 @@ namespace App\Services;
 use App\Models\AnimalImage;
 use App\Models\Animal;
 use App\Models\History;
-use App\Models\Place;
-use App\Services\HistoryService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -42,9 +40,6 @@ class AnimalService
             'receive_place' => $data['receive_place'] ?? '',
             'receive_date'  => $data['receive_date'] ?? '',
             'gender'        => $data['gender'],
-            'owner_name'    => $data['owner_name'] ?? '',
-            'owner_phone'   => $data['owner_phone'] ?? '',
-            'owner_address' => $data['owner_address'] ?? '',
             'date_of_birth' => $this->detectBirth($data['age_year'] ?? 0, $data['age_month'] ?? 0),
             'note'          => $data['note'] ?? '',
             'foster_id'     => $data['foster_id'] ?? 0,
@@ -58,7 +53,7 @@ class AnimalService
         $this->insertImages($animal, $images);
 
         // log history
-        $this->historyService->createCase($animal->id);
+        $this->historyService->createAnimal($animal->id);
     }
 
     public function editAnimal($data, $id)
@@ -85,9 +80,6 @@ class AnimalService
             'receive_place' => $data['receive_place'] ?? '',
             'receive_date'  => $data['receive_date'] ?? '',
             'gender'        => $data['gender'],
-            'owner_name'    => $data['owner_name'] ?? '',
-            'owner_phone'   => $data['owner_phone'] ?? '',
-            'owner_address' => $data['owner_address'] ?? '',
             'date_of_birth' => $this->detectBirth($data['age_year'] ?? 0, $data['age_month'] ?? 0),
             'note'          => $data['note'] ?? '',
             'foster_id'     => $data['foster_id'] ?? null,

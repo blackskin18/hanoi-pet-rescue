@@ -56,6 +56,12 @@ class PlaceController extends Controller
         return $this->responseSuccess();
     }
 
+    public function update($placeId) {
+        $this->placeService->updatePlace(request()->all(), $placeId);
+
+        return $this->responseSuccess();
+    }
+
     public function show($placeId)
     {
         $place = $this->placeService->getPlaceBtId($placeId);

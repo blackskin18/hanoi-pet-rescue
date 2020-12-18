@@ -17,6 +17,7 @@ class HistoryService
             'user_id' => Auth()->user()->id,
             'animal_id' => $animalId,
             'note' => History::NOTE_CREATE_CASE,
+            'attribute' => 'create_case'
         ]);
     }
 

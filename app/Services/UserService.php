@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Place;
+use App\Models\RoleUser;
 use App\Models\User;
 
 class UserService
@@ -66,11 +67,11 @@ class UserService
     public function createUser($data)
     {
         $user = User::create([
-            'name' => $data['name'],
-            'phone' => $data['phone'] ?? '',
+            'name'    => $data['name'],
+            'phone'   => $data['phone'] ?? '',
             'address' => $data['address'] ?? '',
-            'email' => $data['email'],
-            "note" => $data['note'] ?? '',
+            'email'   => $data['email'],
+            "note"    => $data['note'] ?? '',
         ]);
 
         $user->roles()->attach($data['roles']);
@@ -128,20 +129,38 @@ class UserService
         return $places->count();
     }
 
-    public function getUserById($userId) {
+    public function getUserById($userId)
+    {
         return User::with('roles')->find($userId);
     }
 
-    public function deleteById($userId) {
+    public function deleteById($userId)
+    {
         $user = User::with(['animals', 'roles', 'animalCreated'])->find($userId);
-        if(count($user->animals) > 0) {
+        if (count($user->animals) > 0) {
             return 'Đang có Case ở nhà chủ tài khoản này, nên ko thể xóa';
         }
-        if(count($user->animalCreated) > 0) {
+        if (count($user->animalCreated) > 0) {
             return 'Tài khoản này đã từng tạo case, nên không thể xóa';
         } else {
             $user->delete();
+
             return true;
         }
+    }
+
+    public function updateUser($data, $userId)
+    {
+        $user = User::find($userId);
+        $user->update([
+            'name'    => $data['name'],
+            'phone'   => $data['phone'] ?? '',
+            'address' => $data['address'] ?? '',
+            'email'   => $data['email'],
+            "note"    => $data['note'] ?? '',
+        ]);
+
+        RoleUser::where('user_id', $userId)->delete();
+        $user->roles()->attach($data['roles']);
     }
 }

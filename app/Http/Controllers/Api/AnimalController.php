@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\AnimalHospital;
+use App\Exports\ReportExport;
+use App\Hospital;
 use App\Http\Controllers\Controller;
 use App\Services\AnimalService;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\StoreAnimal;
 use App\Http\Requests\EditAnimal;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 
 class AnimalController extends Controller
@@ -76,15 +79,27 @@ class AnimalController extends Controller
 
     public function test($animalId)
     {
+        $type = 0;
+        if(!request()->get('start_time')) $type = 1;
+        $reportData = $this->animalService->getReportData(request()->get('start_time'), request()->get('end_time'));
+
+
+
+        return Excel::download(new ReportExport($reportData, $type, request()->get('end_time')),
+            'invoices.xlsx');
+    }
+
+    //public function test($animalId)
+    //{
         // update date_of_birth
 
-//        $animals = DB::table('animals')
-//            ->where('age', null)->get();
-//
-//        foreach($animals as $animal) {
-//            DB::table('animals')
-//                ->where('id', $animal->id)->update(['date_of_birth' => '2020-12-18']);
-//        }
+        //$animals = DB::table('animals')
+        //    ->where('age', null)->get();
+        //
+        //foreach($animals as $animal) {
+        //    DB::table('animals')
+        //        ->where('id', $animal->id)->update(['date_of_birth' => '2020-12-18']);
+        //}
 
 //        insert place
 //        hospitals
@@ -100,14 +115,23 @@ class AnimalController extends Controller
 //            ]);
 //        }
 
-//        common home
-//        DB::table('places')->insert([
-//                'type' => self::COMMON_HOME,
-//                'phone' => '',
-//                'address' => '',
-//                'note' => 'Nhà chung từ hệ thống cũ',
-//                'name' => 'Nhà chung',
-//            ]);
+        //common home
+        //DB::table('places')->insert([
+        //        'type' => self::COMMON_HOME,
+        //        'phone' => '',
+        //        'address' => '',
+        //        'note' => 'Nhà chung từ hệ thống cũ',
+        //        'name' => 'Nhà chung',
+        //    ]);
+
+        //Nhà Chung Hoài Đức
+        //DB::table('places')->insert([
+        //    'type' => self::COMMON_HOME,
+        //    'phone' => '',
+        //    'address' => '',
+        //    'note' => 'Nhà chung từ hệ thống cũ',
+        //    'name' => 'Nhà chung Hoài Đức',
+        //]);
 
 //        foster
 //        $fosters = DB::table('animal_fosters')
@@ -128,19 +152,41 @@ class AnimalController extends Controller
 
 
 //        update animal place
-        $animals =  $fosters = DB::table('animals')->get();
-        $places = 0;
-        foreach ($animals as $animal) {
-            $place = DB::table('animal_hospitals')->where('animal_id', $animal->id)->orderBy('created_at', 'desc')->take(1)->get();
-//            dd($place);
-            if($place)
-            $places++;
-//            $place[0]->hospital;
-//            $histories[$key]['old_value_place'] =  $place[0];
-        }
-        dd($places);die;
+//        $animals = DB::table('animals')->where('place', 'hospital')->get();
+//        foreach ($animals as $animal) {
+//            $place = DB::table('animal_hospitals')->where('animal_id', $animal->id)->orderBy('created_at', 'desc')->take(1)->get();
+//            if(isset($place[0])) {
+//                $newPlace = DB::table('places')->where('old_id', $place[0]->hospital_id)->where('type', self::HOSPITAL)->first();
+//                DB::table('animals')
+//                    ->where('id', $animal->id)
+//                    ->where('place', 'hospital')
+//                    ->update(['place_id' => $newPlace->id,
+//                              'place_type' => self::HOSPITAL]);
+//            }
+//        }
 
-        dd($animals);
 
-    }
+        //$animals = DB::table('animals')->where('place', 'volunteer')->get();
+        //foreach ($animals as $animal) {
+        //    $place = DB::table('animal_fosters')->where('animal_id', $animal->id)->orderBy('created_at', 'desc')->take(1)->get();
+        //    if(isset($place[0])) {
+        //        $newPlace = DB::table('places')->where('old_id', $place[0]->foster_id)->where('type', self::FOSTER)->first();
+        //        DB::table('animals')
+        //            ->where('id', $animal->id)
+        //            ->where('place', 'volunteer')
+        //            ->update(['place_id' => $newPlace->id,
+        //                  'place_type' => self::FOSTER]);
+        //
+        //    }
+        //}
+
+
+        //DB::table('animals')->where('place', 'Nhà Chung Hoài Đức')
+        //    ->update(['place_id' => 102,
+        //          'place_type' => self::COMMON_HOME]);
+        //DB::table('animals')->where('place', 'commonHome')
+        //    ->update(['place_id' => 23,
+        //              'place_type' => self::COMMON_HOME]);
+
+    //}
 }

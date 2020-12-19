@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\AnimalImage;
 use App\Models\Animal;
 use App\Models\History;
+use App\Models\Place;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -23,7 +24,7 @@ class AnimalService
         $images = $data['images'] ?? [];
         $code = isset($data['code']) && $data['code'] ? $data['code'] : Animal::max('code');
         $codeFull = $this->generateCode($data, $code);
-        if(isset($data['branch_id']) && isset($data['place_id']) && $data['place_id'] && $data['branch_id']) {
+        if (isset($data['branch_id']) && isset($data['place_id']) && $data['place_id'] && $data['branch_id']) {
             $placeId = $data['branch_id'];
         } else {
             $placeId = $data['place_id'];
@@ -62,7 +63,7 @@ class AnimalService
         $oldImages = $data['old_images'] ?? [];
         $code = isset($data['code']) && $data['code'] ? $data['code'] : Animal::max('code');
         $codeFull = $this->generateCode($data, $code);
-        if(isset($data['branch_id']) && isset($data['place_id']) && $data['place_id'] && $data['branch_id']) {
+        if (isset($data['branch_id']) && isset($data['place_id']) && $data['place_id'] && $data['branch_id']) {
             $placeId = $data['branch_id'];
         } else {
             $placeId = $data['place_id'];
@@ -144,7 +145,7 @@ class AnimalService
 
         //search
         $animals = $this->filterAnimal($animals, $data);
-        $animals = $animals->limit($limit)->with('animalImage')->with('status')->orderBy('code', 'ASC')->get();
+        $animals = $animals->limit($limit)->with('animalImage')->with('status')->orderBy('code', 'DESC')->get();
 
         // get full image url
         $animals = $animals->map(function ($animal) {
@@ -222,7 +223,14 @@ class AnimalService
 
     public function getAnimalById($id)
     {
-        $animal = Animal::with(['status', 'animalImage', 'foster', 'place', 'owner'])->find($id);
+
+        $animal = Animal::with([
+            'status',
+            'animalImage',
+            'foster',
+            'place',
+            'owner',
+        ])->find($id);
 
         $animal->animal_image = $animal->animalImage->map(function ($image) {
             $image->path = url('storage/animal_image/'.$image->animal_id.'/'.$image->file_name);
@@ -230,8 +238,26 @@ class AnimalService
             return $image;
         });
 
+        $histories = History::where('animal_id', $id)->with('user:id,name')->orderBy('created_at', 'desc')->get();
+        foreach ($histories as &$history) {
+            if($history->attribute === 'place_id' || $history->attribute === 'foster_id' || $history->attribute === 'owner_id') {
+                $old = Place::find($history->old_value);
+                $new = Place::find($history->new_value);
+                $history->old_value = $old ?? $history->old_value;
+                $history->new_value = $new ?? $history->new_value;
+            }
+            if($history->attribute === 'image') {
+                $history->old_value = $history->old_value ?  url('storage/animal_image/'.$id.'/'.$history->old_value) : '';
+                $history->new_value = $history->new_value ?  url('storage/animal_image/'.$id.'/'.$history->new_value) : '';
+            }
+        }
+
+        $animal->history = $histories;
+
         return $animal;
     }
+
+
 
     public function deleteById($id)
     {
@@ -240,19 +266,35 @@ class AnimalService
 
     public function getReportData($startTime, $endTime)
     {
+        if (! $startTime) {
+            $startTime = '2010/01/01';
+        }
+
         $reportStatus = DB::table('animals')->selectRaw('type, status, count(*) as count')->whereBetween('receive_date', [
-                $startTime,
-                $endTime,
-            ])->groupBy(['type', 'status'])->get();
+            $startTime,
+            $endTime,
+        ])->groupBy(['type', 'status'])->get();
 
         $reportPlace = DB::table('animals')->whereBetween('receive_date', [
-                $startTime,
-                $endTime,
-            ])->selectRaw('type, place_type, count(*) as count')->groupBy(['type', 'place_type'])->get();
+            $startTime,
+            $endTime,
+        ])->selectRaw('type, place_type, count(*) as count')->groupBy(['type', 'place_type'])->get();
+
+        $reportType = DB::table('animals')->whereBetween('receive_date', [
+            $startTime,
+            $endTime,
+        ])->selectRaw('type, count(*) as count')->groupBy(['type'])->get();
+
+        $count = DB::table('animals')->whereBetween('receive_date', [
+            $startTime,
+            $endTime,
+        ])->selectRaw('count(*) as count')->get();
 
         return [
             'report_by_status' => $reportStatus,
             'report_by_place'  => $reportPlace,
+            'report_by_type'   => $reportType,
+            'count'            => $count[0]->count,
         ];
     }
 }

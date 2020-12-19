@@ -66,6 +66,11 @@ class Animal extends Model
         return $this->hasOne('App\Models\Status', 'id', 'status');
     }
 
+    public function history()
+    {
+        return $this->hasMany('App\Models\History');
+    }
+
     public function place()
     {
         return $this->belongsTo('App\Models\Place');

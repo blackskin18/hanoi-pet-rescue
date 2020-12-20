@@ -74,7 +74,7 @@ class AnimalService
         Animal::find($id)->update([
             'code'          => $code,
             'code_full'     => $codeFull,
-            'name'          => $data['name'],
+            'name'          => $data['name'] ?? '',
             'description'   => $data['description'] ?? '',
             'status'        => $data['status'],
             'type'          => $data['type'],

@@ -145,7 +145,7 @@ class AnimalService
 
         //search
         $animals = $this->filterAnimal($animals, $data);
-        $animals = $animals->limit($limit)->with('animalImage')->with('status')->orderBy('code', 'DESC')->get();
+        $animals = $animals->limit($limit)->with('animalImage')->with('place')->with('status')->orderBy('code', 'DESC')->get();
 
         // get full image url
         $animals = $animals->map(function ($animal) {

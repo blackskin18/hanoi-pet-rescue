@@ -176,7 +176,7 @@ class AnimalService
     private function filterAnimal($animals, $data)
     {
         if (isset($data['code']) && $data['code'] !== '') {
-            $animals->where('code', 'like', '%'.$data['code'].'%');
+            $animals->where('code_full', 'like', '%'.$data['code'].'%');
         }
         if (isset($data['description']) && $data['description'] !== '') {
             $animals->where('description', 'like', '%'.$data['description'].'%');

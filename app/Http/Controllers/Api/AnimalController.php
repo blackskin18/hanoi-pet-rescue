@@ -81,10 +81,10 @@ class AnimalController extends Controller
     public function exportReport()
     {
         $type = 0;
-        $fileName = "bao_cao_cuu_ho.xlxs";
+        $fileName = "bao_cao_cuu_ho.xlsx";
         if(!request()->get('start_time')) {
             $type = 1;
-            $fileName = "bao_cao_cuu_ho_luy_tien.xlxs";
+            $fileName = "bao_cao_cuu_ho_luy_ke.xlsx";
         }
         $reportData = $this->animalService->getReportData(request()->get('start_time'), request()->get('end_time'));
 

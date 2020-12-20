@@ -26,6 +26,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('/animal-test/{id}', [AnimalController::class, 'test']);
+Route::get('/export-report', [AnimalController::class, 'exportReport']);
 
 Route::get('/places/root-hospitals', [PlaceController::class, 'getRootHospitals']);
 Route::get('/places/hospitals', [PlaceController::class, 'getHospitals']);

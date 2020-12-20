@@ -6,13 +6,14 @@ use App\AnimalHospital;
 use App\Exports\ReportExport;
 use App\Hospital;
 use App\Http\Controllers\Controller;
+use App\Models\Animal;
 use App\Services\AnimalService;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\StoreAnimal;
 use App\Http\Requests\EditAnimal;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
-
 
 class AnimalController extends Controller
 {
@@ -77,20 +78,22 @@ class AnimalController extends Controller
         return $this->responseSuccess($reportData);
     }
 
-    public function test($animalId)
+    public function exportReport()
     {
         $type = 0;
-        if(!request()->get('start_time')) $type = 1;
+        $fileName = "bao_cao_cuu_ho.xlxs";
+        if(!request()->get('start_time')) {
+            $type = 1;
+            $fileName = "bao_cao_cuu_ho_luy_tien.xlxs";
+        }
         $reportData = $this->animalService->getReportData(request()->get('start_time'), request()->get('end_time'));
 
-
-
         return Excel::download(new ReportExport($reportData, $type, request()->get('end_time')),
-            'invoices.xlsx');
+            $fileName);
     }
 
-    //public function test($animalId)
-    //{
+    public function test($animalId)
+    {
         // update date_of_birth
 
         //$animals = DB::table('animals')
@@ -182,11 +185,64 @@ class AnimalController extends Controller
 
 
         //DB::table('animals')->where('place', 'Nhà Chung Hoài Đức')
-        //    ->update(['place_id' => 102,
+        //    ->update(['place_id' => 24,
         //          'place_type' => self::COMMON_HOME]);
         //DB::table('animals')->where('place', 'commonHome')
         //    ->update(['place_id' => 23,
         //              'place_type' => self::COMMON_HOME]);
 
-    //}
+
+        //update gender
+        //$animals = DB::table('animals')->get();
+        //foreach ($animals as $animal) {
+        //    DB::table('animals')
+        //        ->where('id', $animal->id)
+        //        ->update([
+        //        'gender' =>3,
+        //    ]);
+        //}
+
+        // update code full
+        //$animals = DB::table('animals')->get();
+        //foreach ($animals as $animal) {
+        //    DB::table('animals')
+        //        ->where('id', $animal->id)
+        //        ->update([
+        //            'code_full' => $this->generateCode($animal)
+        //        ]);
+        //}
+
+        //DB::table('animals')
+        //    ->where('id', 1)
+        //    ->update([
+        //        'old_name' => "aaaaa \n bbbbss",
+        //    ]);
+
+        $animals = DB::table('animals')->get();
+        foreach ($animals as $animal) {
+            DB::table('animals')
+                ->where('id', $animal->id)
+                ->update([
+                    'old_name' => $animal->name,
+                    'name' => '',
+                    'description' => $animal->name . "\n" . $animal->description
+                ]);
+        }
+
+    }
+
+    private function generateCode($animal)
+    {
+        $year = substr((new Carbon($animal->receive_date))->year, 2);
+        $type = $animal->type == Animal::TYPE_DOG ? 'D' : ($animal->type == Animal::TYPE_CAT ? 'C' : 'O');
+        $gender = $animal->gender == Animal::GENDER_M ? 'M' : ($animal->gender == Animal::GENDER_F ? 'F' : 'O');
+
+        //$prefix ='';
+        //
+        //if(strlen($animal->code) === 1) $prefix .= "000";
+        //if(strlen($animal->code) === 2) $prefix .= "00";
+        //if(strlen($animal->code) === 3) $prefix .= "0";
+
+        return $year.$type.$gender.$animal->code;
+    }
 }

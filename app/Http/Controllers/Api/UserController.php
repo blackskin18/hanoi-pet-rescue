@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\EditUser;
+use App\Http\Requests\StoreUser;
 use App\Models\User;
 use App\Services\PlaceService;
 use App\Models\Place;
@@ -38,14 +40,14 @@ class UserController extends Controller
         return $this->responseSuccess($hospitals);
     }
 
-    public function store()
+    public function store(StoreUser $request)
     {
         $this->userService->createUser(request()->all());
 
         return $this->responseSuccess();
     }
 
-    public function update($userId)
+    public function update(EditUsers $request, $userId)
     {
         $a = $this->userService->updateUser(request()->all(), $userId);
 

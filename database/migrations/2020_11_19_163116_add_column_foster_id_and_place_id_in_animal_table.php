@@ -13,10 +13,11 @@ class AddColumnFosterIdAndPlaceIdInAnimalTable extends Migration
      */
     public function up()
     {
-        Schema::table('animalS', function (Blueprint $table) {
+        Schema::table('animals', function (Blueprint $table) {
             //
             $table->integer('foster_id')->nullable()->default(null);
             $table->integer('place_id')->nullable()->default(null);
+            $table->integer('owner_id')->nullable()->default(null);
         });
     }
 

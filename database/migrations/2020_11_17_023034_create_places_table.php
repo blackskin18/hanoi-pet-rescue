@@ -33,24 +33,24 @@ class CreatePlacesTable extends Migration
             $table->timestamps();
         });
 
-        $hospitals = DB::table('hospitals')->get();
-        foreach ($hospitals as $hospital) {
-            DB::table('places')->insert([
-                'type' => self::HOSPITAL,
-                'phone' => $hospital->phone,
-                'address' => $hospital->address,
-                'note' => $hospital->note,
-                'name' => $hospital->name,
-            ]);
-        }
-
-        DB::table('places')->insert([
-            'type' => 2,
-            'phone' => '',
-            'address' => '',
-            'note' => '',
-            'name' => 'nhà chung',
-        ]);
+        //$hospitals = DB::table('hospitals')->get();
+        //foreach ($hospitals as $hospital) {
+        //    DB::table('places')->insert([
+        //        'type' => self::HOSPITAL,
+        //        'phone' => $hospital->phone,
+        //        'address' => $hospital->address,
+        //        'note' => $hospital->note,
+        //        'name' => $hospital->name,
+        //    ]);
+        //}
+        //
+        //DB::table('places')->insert([
+        //    'type' => 2,
+        //    'phone' => '',
+        //    'address' => '',
+        //    'note' => '',
+        //    'name' => 'nhà chung',
+        //]);
     }
 
     /**

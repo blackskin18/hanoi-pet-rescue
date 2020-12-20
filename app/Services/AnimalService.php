@@ -54,7 +54,7 @@ class AnimalService
         $this->insertImages($animal, $images);
 
         // log history
-        $this->historyService->createAnimal($animal->id);
+        $this->historyService->createAnimal($animal);
     }
 
     public function editAnimal($data, $id)

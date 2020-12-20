@@ -5,20 +5,25 @@ namespace App\Services;
 use App\Models\Animal;
 use App\Models\History;
 use App\Models\Place;
+use App\Models\PlaceHistory;
 use App\Models\Status;
 use App\Models\User;
 
 class HistoryService
 {
 
-    public function createAnimal($animalId)
+    public function createAnimal($animal)
     {
         History::create([
             'user_id' => Auth()->user()->id,
-            'animal_id' => $animalId,
+            'animal_id' => $animal->id,
             'note' => History::NOTE_CREATE_CASE,
             'attribute' => 'create_case'
         ]);
+
+        if($animal->place_id) {
+            $this->addPlaceHistory($animal->id, $animal->place_id);
+        }
     }
 
 
@@ -60,8 +65,16 @@ class HistoryService
             $this->saveLog($oldAnimal->id, 'owner_id', $oldAnimal->owner_id, $newValue->owner_id, History::NOTE_EDIT_OWNER_ID);
         }
         if($oldAnimal->place_id != $newValue->place_id) {
+            $this->addPlaceHistory($oldAnimal->id, $newValue->place_id);
             $this->saveLog($oldAnimal->id, 'place_id', $oldAnimal->place_id, $newValue->place_id, History::NOTE_EDIT_PLACE_ID);
         }
+    }
+
+    private function addPlaceHistory($animal_id, $place_id) {
+        PlaceHistory::create([
+            'place_id' => $place_id,
+            'animal_id' => $animal_id
+        ]);
     }
 
     public function deleteImages($animalId, $images) {

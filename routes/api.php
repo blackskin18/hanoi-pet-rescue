@@ -8,7 +8,7 @@ use App\Http\Controllers\Api\PlaceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\UserRoleController;
+use App\Http\Controllers\Api\PlaceHistoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,3 +39,4 @@ Route::apiResource('/statuses', StatusController::class);
 Route::apiResource('/places', PlaceController::class);
 Route::apiResource('/roles', RoleController::class);
 Route::apiResource('/users', UserController::class);
+Route::apiResource('/place-histories', PlaceHistoryController::class);

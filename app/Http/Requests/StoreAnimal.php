@@ -59,6 +59,7 @@ class StoreAnimal extends FormRequest
             'owner_id.integer'       => 'Lỗi ko tìm thấy foster, liên hệ với kỹ thuật',
             'age_month.integer'      => 'Số tháng tuổi của case phải là số',
             'age_year.integer'       => 'Số năm tuổi của case phải là số',
+            'place_id.required'      => 'Vui lòng chọn nơi ở hiện tại',
         ];
     }
 }

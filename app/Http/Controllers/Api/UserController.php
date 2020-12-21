@@ -47,7 +47,7 @@ class UserController extends Controller
         return $this->responseSuccess();
     }
 
-    public function update(EditUsers $request, $userId)
+    public function update(EditUser $request, $userId)
     {
         $a = $this->userService->updateUser(request()->all(), $userId);
 

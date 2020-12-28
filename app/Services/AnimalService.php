@@ -221,17 +221,17 @@ class AnimalService
         return $date->isoFormat('Y-M-D');
     }
 
-    public function getAnimalById($id)
+    public function getAnimalByCode($code)
     {
-
         $animal = Animal::with([
             'status',
             'animalImage',
             'foster',
             'place',
             'owner',
-        ])->find($id);
+        ])->where('code', $code)->first();
 
+        $id = $animal->id;
         $animal->animal_image = $animal->animalImage->map(function ($image) {
             $image->path = url('storage/animal_image/'.$image->animal_id.'/'.$image->file_name);
 

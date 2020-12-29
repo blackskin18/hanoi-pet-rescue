@@ -209,7 +209,15 @@ class AnimalService
         $type = $data['type'] == Animal::TYPE_DOG ? 'D' : ($data['type'] == Animal::TYPE_CAT ? 'C' : 'O');
         $gender = $data['gender'] == Animal::GENDER_M ? 'M' : ($data['gender'] == Animal::GENDER_F ? 'F' : 'O');
 
+        if(!$code) {
+            $code = $this->getCodeToCreate();
+        }
+
         return $year.$type.$gender.$code;
+    }
+
+    public function getCodeToCreate() {
+        return  Animal::max('code') + 1;
     }
 
     private function detectBirth($year, $month)
@@ -266,29 +274,27 @@ class AnimalService
 
     public function getReportData($startTime, $endTime)
     {
-        if (! $startTime) {
-            $startTime = '2010/01/01';
+        $reportStatus = DB::table('animals')->selectRaw('type, status, count(*) as count');
+        $reportPlace = DB::table('animals')->selectRaw('type, place_type, count(*) as count');
+        $reportType = DB::table('animals')->selectRaw('type, count(*) as count');
+        $count = DB::table('animals')->selectRaw('count(*) as count');
+
+        if(!$startTime) {
+            $reportStatus = $reportStatus->whereDate('receive_date','<', $endTime);
+            $reportPlace = $reportPlace->whereDate('receive_date','<', $endTime);
+            $reportType = $reportType->whereDate('receive_date','<', $endTime);
+            $count = $count->whereDate('receive_date','<', $endTime);
+        } else {
+            $reportStatus->whereBetween('receive_date', [$startTime,$endTime]);
+            $reportPlace->whereBetween('receive_date', [$startTime,$endTime]);
+            $reportType->whereBetween('receive_date', [$startTime,$endTime]);
+            $count->whereBetween('receive_date', [$startTime,$endTime]);
         }
 
-        $reportStatus = DB::table('animals')->selectRaw('type, status, count(*) as count')->whereBetween('receive_date', [
-            $startTime,
-            $endTime,
-        ])->groupBy(['type', 'status'])->get();
-
-        $reportPlace = DB::table('animals')->whereBetween('receive_date', [
-            $startTime,
-            $endTime,
-        ])->selectRaw('type, place_type, count(*) as count')->groupBy(['type', 'place_type'])->get();
-
-        $reportType = DB::table('animals')->whereBetween('receive_date', [
-            $startTime,
-            $endTime,
-        ])->selectRaw('type, count(*) as count')->groupBy(['type'])->get();
-
-        $count = DB::table('animals')->whereBetween('receive_date', [
-            $startTime,
-            $endTime,
-        ])->selectRaw('count(*) as count')->get();
+        $reportStatus = $reportStatus->groupBy(['type', 'status'])->get();
+        $reportPlace = $reportPlace->groupBy(['type', 'place_type'])->get();
+        $reportType = $reportType->groupBy(['type'])->get();
+        $count = $count->get();
 
         return [
             'report_by_status' => $reportStatus,

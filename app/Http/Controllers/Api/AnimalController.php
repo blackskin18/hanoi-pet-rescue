@@ -45,9 +45,9 @@ class AnimalController extends Controller
         return $this->responseSuccess();
     }
 
-    public function show($animalId)
+    public function show($code)
     {
-        $animal = $this->animalService->getAnimalById($animalId);
+        $animal = $this->animalService->getAnimalByCode($code);
 
         return $this->responseSuccess($animal);
     }
@@ -90,6 +90,10 @@ class AnimalController extends Controller
 
         return Excel::download(new ReportExport($reportData, $type, request()->get('end_time')),
             $fileName);
+    }
+
+    public function getLastCode() {
+        return $this->responseSuccess(['code' => $this->animalService->getCodeToCreate()]);
     }
 
     public function test($animalId)

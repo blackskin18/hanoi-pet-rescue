@@ -12,6 +12,11 @@ class PlaceHistoryService
         $all = PlaceHistory::where('place_id', $placeId)->with('animal.animalImage')->get();
         $now = Animal::where('place_id', $placeId)->with('animalImage')->get();
 
+        $all = $all->filter(function ($placeRecord) {
+            return $placeRecord->animal != null;
+        })->toArray();
+        $all = array_values($all);
+
         return [
             'all' => $all,
             'now' => $now,

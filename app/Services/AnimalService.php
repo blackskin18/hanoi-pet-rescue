@@ -41,7 +41,7 @@ class AnimalService
             'receive_place' => $data['receive_place'] ?? '',
             'receive_date'  => $data['receive_date'] ?? '',
             'gender'        => $data['gender'],
-            'date_of_birth' => $this->detectBirth($data['age_year'] ?? 0, $data['age_month'] ?? 0),
+            'date_of_birth' => $this->detectBirth($data['age_year'] ?? 0, $data['age_month'] ?? 0, $data['age_date'] ?? 0),
             'note'          => $data['note'] ?? '',
             'foster_id'     => $data['foster_id'] ?? 0,
             'owner_id'      => $data['owner_id'] ?? 0,
@@ -81,7 +81,7 @@ class AnimalService
             'receive_place' => $data['receive_place'] ?? '',
             'receive_date'  => $data['receive_date'] ?? '',
             'gender'        => $data['gender'],
-            'date_of_birth' => $this->detectBirth($data['age_year'] ?? 0, $data['age_month'] ?? 0),
+            'date_of_birth' => $this->detectBirth($data['age_year'] ?? 0, $data['age_month'] ?? 0, $data['age_date'] ?? 0),
             'note'          => $data['note'] ?? '',
             'foster_id'     => $data['foster_id'] ?? null,
             'owner_id'      => $data['owner_id'] ?? null,
@@ -207,24 +207,25 @@ class AnimalService
     {
         $year = substr((new Carbon($data['receive_date']))->year, 2);
         $type = $data['type'] == Animal::TYPE_DOG ? 'D' : ($data['type'] == Animal::TYPE_CAT ? 'C' : 'O');
-        $gender = $data['gender'] == Animal::GENDER_M ? 'M' : ($data['gender'] == Animal::GENDER_F ? 'F' : 'O');
+//        $gender = $data['gender'] == Animal::GENDER_M ? 'M' : ($data['gender'] == Animal::GENDER_F ? 'F' : 'O');
 
         if(!$code) {
             $code = $this->getCodeToCreate();
         }
 
-        return $year.$type.$gender.$code;
+        return $year.$type.$code;
     }
 
     public function getCodeToCreate() {
         return  Animal::max('code') + 1;
     }
 
-    private function detectBirth($year, $month)
+    private function detectBirth($year, $month, $days)
     {
         $date = Carbon::now();
         $date->sub($year, 'year');
         $date->sub($month, 'month');
+        $date->subDays($days);
 
         return $date->isoFormat('Y-M-D');
     }

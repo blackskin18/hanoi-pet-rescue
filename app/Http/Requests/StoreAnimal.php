@@ -25,12 +25,12 @@ class StoreAnimal extends FormRequest
     {
         return [
             'code'          => 'required|integer|unique:animals',
-            'images'        => 'image',
+            'images.*'      => 'image',
             'receive_place' => 'required|string',
             'receive_date'  => 'required|date',
             'name'          => 'string',
             'type'          => 'required',
-            'gender'        => 'required',
+//            'gender'        => 'required',
             'age_month'     => 'integer',
             'age_year'      => 'integer',
             'place_id'      => 'required',
@@ -45,7 +45,7 @@ class StoreAnimal extends FormRequest
     public function messages()
     {
         return [
-            'images.image'           => 'Ảnh không đúng định dạng (chỉ hỗ trợ các định dạng jpeg, png, bmp, gif, svg, or webp)',
+            'images.*.image'         => 'Ảnh không đúng định dạng (chỉ hỗ trợ các định dạng jpeg, png, bmp, gif, svg, or webp)',
             'code.required'          => 'Hãy nhập code',
             'code.integer'           => 'Code phải là số',
             'code.unique'            => 'Code này đã tồn tại, hãy nhập code khác',
@@ -53,7 +53,7 @@ class StoreAnimal extends FormRequest
             'receive_date.required'  => 'Hãy nhập ngày nhận',
             'receive_date.date'      => 'Ngày nhận không đúng định dạng',
             'type.required'          => 'Hãy nhập chọn loài',
-            'gender.required'        => 'Hãy chọn giới tính của case',
+//            'gender.required'        => 'Hãy chọn giới tính của case',
             'status.required'        => 'Hãy chọn trạng thái của case',
             'foster_id.integer'      => 'Lỗi ko tìm thấy foster, liên hệ với kỹ thuật',
             'owner_id.integer'       => 'Lỗi ko tìm thấy foster, liên hệ với kỹ thuật',

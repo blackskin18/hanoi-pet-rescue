@@ -31,26 +31,22 @@ class AuthController extends Controller
      */
     public function login()
     {
-        $user = User::find(92);
-        $token = auth()->login($user);
-        return $this->respondWithToken($token);
+        $tokenId = request('tokenId');
 
-        //$tokenId = request('tokenId');
-        //
-        //$client = new Google_Client(['client_id' => '904910057330-6gbn36bltbl6qq89ddvpm5j0lhb6nu4q.apps.googleusercontent.com']);  // Specify the CLIENT_ID of the app that accesses the backend
-        //$payload = $client->verifyIdToken($tokenId);
-        //Log::info($payload);
-        //if ($payload) {
-        //    $user = $this->userService->verifyUser($payload['email'], $payload['sub']);
-        //    if (!$user) {
-        //        return $this->responseForbidden();
-        //    }
-        //
-        //    $token = auth()->login($user);
-        //    return $this->respondWithToken($token);
-        //} else {
-        //    return $this->responseForbidden();
-        //}
+        $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_KEY')]);  // Specify the CLIENT_ID of the app that accesses the backend
+        $payload = $client->verifyIdToken($tokenId);
+        Log::info($payload);
+        if ($payload) {
+            $user = $this->userService->verifyUser($payload['email'], $payload['sub']);
+            if (!$user) {
+                return $this->responseForbidden();
+            }
+
+            $token = auth()->login($user);
+            return $this->respondWithToken($token);
+        } else {
+            return $this->responseForbidden();
+        }
     }
 
     /**
@@ -82,7 +78,12 @@ class AuthController extends Controller
      */
     public function verify()
     {
-        return $this->respondWithToken(auth()->refresh());
+        if(Auth::user()) {
+            return $this->responseSuccess();
+        } else {
+            return $this->responseForbidden();
+        }
+//        return $this->respondWithToken(auth()->refresh());
     }
 
     /**

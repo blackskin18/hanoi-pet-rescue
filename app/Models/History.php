@@ -40,4 +40,9 @@ class History extends Model
     {
         return $this->belongsTo('App\Models\User');
     }
+
+    public function animal()
+    {
+        return $this->belongsTo('App\Models\Animal');
+    }
 }

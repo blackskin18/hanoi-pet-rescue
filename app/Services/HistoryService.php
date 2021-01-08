@@ -11,6 +11,7 @@ use App\Models\User;
 
 class HistoryService
 {
+    CONST LIMIT_DEFAULT = 20;
 
     public function createAnimal($animal)
     {
@@ -126,5 +127,57 @@ class HistoryService
         $history->new_value = $newValue;
         $history->note = $note;
         $history->save();
+    }
+
+    public function getCountHistory($data)
+    {
+        if(isset($data['start_date']) && isset($data['end_date']) &&
+            $data['start_date'] && $data['end_date']
+        ) {
+            return History::where('created_at', '<=', $data['end_date'])
+                ->where('created_at', '>=', $data['start_date'])
+                ->count();
+        } else {
+            return History::count();
+        }
+    }
+
+    public function getHistories($data) {
+        $page = isset($data['page']) && $data['page'] >= 1 ? $data['page'] : 1;
+
+        if(isset($data['start_date']) && isset($data['end_date']) &&
+            $data['start_date'] && $data['end_date']
+        ) {
+            $histories = History::where('created_at', '<=', $data['end_date'])
+                ->where('created_at', '>=', $data['start_date'])
+                ->offset(($page - 1) * self::LIMIT_DEFAULT)
+                ->limit(self::LIMIT_DEFAULT)
+                ->with('user:id,name')
+                ->with('animal:id,code_full,code')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } else {
+            $histories = History::offset(($page - 1) * self::LIMIT_DEFAULT)
+                ->limit(self::LIMIT_DEFAULT)
+                ->with('user:id,name')
+                ->with('animal:id,code_full,code')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+
+        foreach ($histories as &$history) {
+            if($history->attribute === 'place_id' || $history->attribute === 'foster_id' || $history->attribute === 'owner_id') {
+                $old = Place::find($history->old_value);
+                $new = Place::find($history->new_value);
+                $history->old_value = $old ?? $history->old_value;
+                $history->new_value = $new ?? $history->new_value;
+            }
+            if($history->attribute === 'image') {
+                $history->old_value = $history->old_value ?  url('storage/animal_image/'.$history->animal_id.'/'.$history->old_value) : '';
+                $history->new_value = $history->new_value ?  url('storage/animal_image/'.$history->animal_id.'/'.$history->new_value) : '';
+            }
+        }
+
+        return $histories;
     }
 }

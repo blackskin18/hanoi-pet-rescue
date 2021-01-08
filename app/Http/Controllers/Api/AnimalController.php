@@ -26,7 +26,7 @@ class AnimalController extends Controller
 
     public function __construct(AnimalService $animalService)
     {
-        //$this->middleware('jwt-authen');
+        $this->middleware('jwt-authen');
         $this->animalService = $animalService;
     }
 

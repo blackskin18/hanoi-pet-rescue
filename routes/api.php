@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\PlaceHistoryController;
+use App\Http\Controllers\Api\HistoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +29,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::get('/animal-test/{id}', [AnimalController::class, 'test']);
 Route::get('/code-to-create', [AnimalController::class, 'getLastCode']);
 Route::get('/export-report', [AnimalController::class, 'exportReport']);
+
+Route::get('/histories', [HistoryController::class, 'index']);
 
 Route::get('/places/root-hospitals', [PlaceController::class, 'getRootHospitals']);
 Route::get('/places/hospitals', [PlaceController::class, 'getHospitals']);

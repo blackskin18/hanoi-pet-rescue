@@ -27,7 +27,7 @@ class PlaceHistoryController extends Controller
 
     public function __construct(PlaceHistoryService $placeHistoryService)
     {
-        //$this->middleware('jwt-authen');
+        $this->middleware('jwt-authen');
         $this->placeHistoryService = $placeHistoryService;
     }
 

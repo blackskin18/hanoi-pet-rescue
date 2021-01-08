@@ -23,7 +23,7 @@ class SocialAuthController extends Controller
             if(URL::previous() != URL::to('login')) Session::put('pre_url', URL::previous());
         }
         return Socialite::driver($provider)->redirect();
-    }  
+    }
 
     /**
      * Lấy thông tin từ Provider, kiểm tra nếu người dùng đã tồn tại trong CSDL

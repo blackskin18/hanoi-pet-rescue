@@ -9,7 +9,7 @@ class StatusController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('jwt-authen');
+//        $this->middleware('jwt-authen');
     }
 
 

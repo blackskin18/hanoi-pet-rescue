@@ -22,7 +22,7 @@ class UserController extends Controller
     {
         $this->middleware('jwt-authen');
         $this->placeService = $placeService;
-        $this->userService = $userService;
+        $this->userService  = $userService;
     }
 
     public function index()
@@ -31,6 +31,12 @@ class UserController extends Controller
         $total = $this->userService->getTotalUsers(request()->all());
 
         return $this->responseSuccess(['users' => $users, 'total' => $total]);
+    }
+
+    public function getAllUsers()
+    {
+        $users = $this->userService->getAllUsers(request()->all());
+        return $this->responseSuccess(['users' => $users]);
     }
 
     public function getRootHospitals()

@@ -89,6 +89,11 @@ class UserService
         return $users;
     }
 
+    public function getAllUsers()
+    {
+        return User::all();
+    }
+
     private function filterUsers($users, $data)
     {
 

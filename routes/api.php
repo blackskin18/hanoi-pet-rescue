@@ -37,6 +37,7 @@ Route::get('/places/hospitals', [PlaceController::class, 'getHospitals']);
 Route::get('/cases/report', [AnimalController::class, 'getReport']);
 Route::post('/auth/login', [AuthController::class, 'login'])->name('login');
 Route::post('/auth/verify-token', [AuthController::class, 'verify']);
+Route::get('/users/get-all', [UserController::class, 'getAllUsers']);
 
 Route::apiResource('/cases', AnimalController::class);
 Route::apiResource('/statuses', StatusController::class);

@@ -7,6 +7,7 @@ use App\Services\UserService;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Google_Client;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
@@ -33,11 +34,15 @@ class AuthController extends Controller
     {
         $tokenId = request('tokenId');
 
-        $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_KEY')]);  // Specify the CLIENT_ID of the app that accesses the backend
-        $payload = $client->verifyIdToken($tokenId);
-        Log::info($payload);
-        if ($payload) {
-            $user = $this->userService->verifyUser($payload['email'], $payload['sub']);
+//        $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_KEY')]);  // Specify the CLIENT_ID of the app that accesses the backend
+//        $payload = $client->verifyIdToken($tokenId);
+//        Log::info($payload);
+        $user = User::where('email', request('email'))
+            ->first();
+        $check = Hash::check(request('password'), $user->password);
+
+        if ($check) {
+//            $user = $this->userService->verifyUser($payload['email'], $payload['sub']);
             if (!$user) {
                 return $this->responseForbidden();
             }
@@ -79,7 +84,10 @@ class AuthController extends Controller
     public function verify()
     {
         if(Auth::user()) {
-            return $this->responseSuccess();
+            return $this->responseSuccess([
+                'name' => Auth::user()->name,
+                'id' => Auth::user()->id
+            ]);
         } else {
             return $this->responseForbidden();
         }
@@ -97,6 +105,7 @@ class AuthController extends Controller
     {
         return response()->json([
             'name' => auth()->user()->name,
+            'id' => auth()->user()->id,
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60

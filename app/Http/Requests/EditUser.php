@@ -25,13 +25,14 @@ class EditUser extends FormRequest
     public function rules(Request $request)
     {
         $rules = [
-            'name'    => 'required|string|max:45',
-            'address' => 'string|max:100',
-            'phone'   => 'max:15|min:9',
-            'note'    => 'string|max:255',
-            'email'   => 'required|email',
-            'roles'   => 'required',
-            'roles.*' => 'exists:roles,id',
+            'name'     => 'required|string|max:45',
+            'address'  => 'string|max:100',
+            'phone'    => 'max:15|min:9',
+            'note'     => 'string|max:255',
+            'email'    => 'required|email',
+            'roles'    => 'required',
+            'roles.*'  => 'exists:roles,id',
+            'password' => 'confirmed|min:6',
         ];
 
         return $rules;

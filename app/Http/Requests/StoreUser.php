@@ -32,6 +32,7 @@ class StoreUser extends FormRequest
             'email'   => 'required|email|unique:users',
             'roles'   => 'required',
             'roles.*' => 'exists:roles,id',
+            'password' => 'required|confirmed|min:6',
         ];
 
         return $rules;

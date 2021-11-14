@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Place;
 use App\Models\RoleUser;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
@@ -71,6 +72,7 @@ class UserService
             'phone'   => $data['phone'] ?? '',
             'address' => $data['address'] ?? '',
             'email'   => $data['email'],
+            'password'   => Hash::make($data['password']),
             "note"    => $data['note'] ?? '',
         ]);
 
@@ -157,13 +159,18 @@ class UserService
     public function updateUser($data, $userId)
     {
         $user = User::find($userId);
-        $user->update([
+
+        $dataUpdate = [
             'name'    => $data['name'],
             'phone'   => $data['phone'] ?? '',
             'address' => $data['address'] ?? '',
             'email'   => $data['email'],
             "note"    => $data['note'] ?? '',
-        ]);
+        ];
+        if($data['password'] && strlen($data['password'])) {
+            $dataUpdate['password'] = Hash::make($data['password']);
+        }
+        $user->update($dataUpdate);
 
         RoleUser::where('user_id', $userId)->delete();
         $user->roles()->attach($data['roles']);

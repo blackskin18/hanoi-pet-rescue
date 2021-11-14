@@ -26,7 +26,7 @@ class AnimalController extends Controller
 
     public function __construct(AnimalService $animalService)
     {
-        $this->middleware('jwt-authen');
+//        $this->middleware('jwt-authen');
         $this->animalService = $animalService;
     }
 
@@ -100,13 +100,13 @@ class AnimalController extends Controller
     {
         // update date_of_birth
 
-        //$animals = DB::table('animals')
-        //    ->where('age', null)->get();
-        //
-        //foreach($animals as $animal) {
-        //    DB::table('animals')
-        //        ->where('id', $animal->id)->update(['date_of_birth' => '2020-12-18']);
-        //}
+//        $animals = DB::table('animals')
+//            ->where('age', null)->get();
+//
+//        foreach($animals as $animal) {
+//            DB::table('animals')
+//                ->where('id', $animal->id)->update(['date_of_birth' => '2021-11-14']);
+//        }
 
 //        insert place
 //        hospitals
@@ -123,22 +123,22 @@ class AnimalController extends Controller
 //        }
 
         //common home
-        //DB::table('places')->insert([
-        //        'type' => self::COMMON_HOME,
-        //        'phone' => '',
-        //        'address' => '',
-        //        'note' => 'Nhà chung từ hệ thống cũ',
-        //        'name' => 'Nhà chung',
-        //    ]);
+//        DB::table('places')->insert([
+//                'type' => self::COMMON_HOME,
+//                'phone' => '',
+//                'address' => '',
+//                'note' => 'Nhà chung từ hệ thống cũ',
+//                'name' => 'Nhà chung',
+//            ]);
 
         //Nhà Chung Hoài Đức
-        //DB::table('places')->insert([
-        //    'type' => self::COMMON_HOME,
-        //    'phone' => '',
-        //    'address' => '',
-        //    'note' => 'Nhà chung từ hệ thống cũ',
-        //    'name' => 'Nhà chung Hoài Đức',
-        //]);
+//        DB::table('places')->insert([
+//            'type' => self::COMMON_HOME,
+//            'phone' => '',
+//            'address' => '',
+//            'note' => 'Nhà chung từ hệ thống cũ',
+//            'name' => 'Nhà chung Hoài Đức',
+//        ]);
 
 //        foster
 //        $fosters = DB::table('animal_fosters')
@@ -172,55 +172,55 @@ class AnimalController extends Controller
 //            }
 //        }
 
+//
+//        $animals = DB::table('animals')->where('place', 'volunteer')->get();
+//        foreach ($animals as $animal) {
+//            $place = DB::table('animal_fosters')->where('animal_id', $animal->id)->orderBy('created_at', 'desc')->take(1)->get();
+//            if(isset($place[0])) {
+//                $newPlace = DB::table('places')->where('old_id', $place[0]->foster_id)->where('type', self::FOSTER)->first();
+//                DB::table('animals')
+//                    ->where('id', $animal->id)
+//                    ->where('place', 'volunteer')
+//                    ->update(['place_id' => $newPlace->id,
+//                          'place_type' => self::FOSTER]);
+//
+//            }
+//        }
 
-        //$animals = DB::table('animals')->where('place', 'volunteer')->get();
-        //foreach ($animals as $animal) {
-        //    $place = DB::table('animal_fosters')->where('animal_id', $animal->id)->orderBy('created_at', 'desc')->take(1)->get();
-        //    if(isset($place[0])) {
-        //        $newPlace = DB::table('places')->where('old_id', $place[0]->foster_id)->where('type', self::FOSTER)->first();
-        //        DB::table('animals')
-        //            ->where('id', $animal->id)
-        //            ->where('place', 'volunteer')
-        //            ->update(['place_id' => $newPlace->id,
-        //                  'place_type' => self::FOSTER]);
-        //
-        //    }
-        //}
-
-
-        //DB::table('animals')->where('place', 'Nhà Chung Hoài Đức')
-        //    ->update(['place_id' => 24,
-        //          'place_type' => self::COMMON_HOME]);
-        //DB::table('animals')->where('place', 'commonHome')
-        //    ->update(['place_id' => 23,
-        //              'place_type' => self::COMMON_HOME]);
+//
+//        DB::table('animals')->where('place', 'Nhà Chung Hoài Đức')
+//            ->update(['place_id' => 28,
+//                  'place_type' => self::COMMON_HOME]);
+//        DB::table('animals')->where('place', 'commonHome')
+//            ->update(['place_id' => 27,
+//                      'place_type' => self::COMMON_HOME]);
 
 
         //update gender
-        //$animals = DB::table('animals')->get();
-        //foreach ($animals as $animal) {
-        //    DB::table('animals')
-        //        ->where('id', $animal->id)
-        //        ->update([
-        //        'gender' =>3,
-        //    ]);
-        //}
+//        $animals = DB::table('animals')->get();
+//        foreach ($animals as $animal) {
+//            DB::table('animals')
+//                ->where('id', $animal->id)
+//                ->update([
+//                'gender' =>3,
+//            ]);
+//        }
 
         // update code full
-        //$animals = DB::table('animals')->get();
-        //foreach ($animals as $animal) {
-        //    DB::table('animals')
-        //        ->where('id', $animal->id)
-        //        ->update([
-        //            'code_full' => $this->generateCode($animal)
-        //        ]);
-        //}
-
-        //DB::table('animals')
-        //    ->where('id', 1)
-        //    ->update([
-        //        'old_name' => "aaaaa \n bbbbss",
-        //    ]);
+//        $animals = DB::table('animals')->get();
+//        foreach ($animals as $animal) {
+//            DB::table('animals')
+//                ->where('id', $animal->id)
+//                ->update([
+//                    'code_full' => $this->generateCode($animal)
+//                ]);
+//        }
+//
+//        DB::table('animals')
+//            ->where('id', 1)
+//            ->update([
+//                'old_name' => "aaaaa \n bbbbss",
+//            ]);
 
         $animals = DB::table('animals')->get();
         foreach ($animals as $animal) {
@@ -232,7 +232,7 @@ class AnimalController extends Controller
                     'description' => $animal->name . "\n" . $animal->description
                 ]);
         }
-
+        return 'ok';
     }
 
     private function generateCode($animal)
